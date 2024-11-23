@@ -22,10 +22,12 @@ int main(int argc, char** argv){
     string name = "avivEli";
     string settlementName = "BeitarJerusalem";
     FacilityCategory category = FacilityCategory::ECONOMY;
-
-
-    Facility fac = Facility(name,settlementName,category,10,0,0,0);
     cout << "aviv eli goat";
 
-    return 0;
+    cout << "aviv eli goat";
+
+    Facility fac=Facility(name,settlementName,category,10,0,0,0);
+    cout << "aviv eli goat";
+
+    cout << "aviv eli goat";
 }
