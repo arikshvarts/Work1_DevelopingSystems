@@ -1,6 +1,8 @@
 #include "../include/Facility.h"
 #include <string>
 #include <vector>
+#include "Facility.h"
+#include <sstream>
 using std::string;
 using std::vector;
 using namespace std;
@@ -41,14 +43,11 @@ FacilityType::FacilityType(const FacilityType &other)
 Facility::Facility(const string &name, const string &settlementName, const FacilityCategory category, 
                    const int price, const int lifeQuality_score, const int economy_score, const int environment_score)
     : FacilityType(name, category, price, lifeQuality_score, economy_score, environment_score), 
-      settlementName(settlementName), status(FacilityStatus::UNDER_CONSTRUCTIONS) {
-        timeLeft=price;
+      settlementName(settlementName), status(FacilityStatus::UNDER_CONSTRUCTIONS),timeLeft(price) {
       }
 
 Facility::Facility(const FacilityType &type, const string &settlementName)
-    : FacilityType(type), settlementName(settlementName), status(FacilityStatus::UNDER_CONSTRUCTIONS) {
-        timeLeft=price;
-    }
+    : FacilityType(type), settlementName(settlementName), status(FacilityStatus::UNDER_CONSTRUCTIONS),timeLeft(type.getCost()) {}
     
     const string& Facility::getSettlementName() const
     {
@@ -71,6 +70,12 @@ Facility::Facility(const FacilityType &type, const string &settlementName)
     {
     return status;
     }
+    const string Facility::toString() const
+    {
+        std::ostringstream oss;
+        oss << "Name: " << name << ", SettlementName: " << getSettlementName() << ", getTimeLeft: " << getTimeLeft() << " Status:",getStatus();
+        return oss.str();    }
+    
     void Facility::setStatus(FacilityStatus status)
     {
         this ->status = status;

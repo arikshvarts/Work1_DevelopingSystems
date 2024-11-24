@@ -1,36 +1,33 @@
 # Compiler and flags
 CC = g++
-CFLAGS = -Wall -g -Iinclude  # Include the 'include' directory for headers
+CFLAGS = -Wall -g -Iinclude -std=c++11
 
 # Directories
 SRCDIR = src
 INCDIR = include
-OBJDIR = bin
+BINDIR = bin
 
-# Source files and object files
-SRCS = $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(INCDIR)/*.cpp)  # All .cpp files in 'src' and 'include'
-OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRCS))  # Corresponding .o files
-TARGET = program  # Output executable
+# Source and object files
+SOURCES = $(wildcard $(SRCDIR)/*.cpp)  # take all files with .cpp ending
+OBJECTS = $(patsubst $(SRCDIR)/%.cpp, $(BINDIR)/%.o, $(SOURCES))  # Object files in bin/
+TARGET = $(BINDIR)/main  # Output executable
 
 # Default rule
 all: $(TARGET)
 
-# Linking the executable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
+# Build executable
+$(TARGET): $(OBJECTS)
+	mkdir -p $(BINDIR)  # Ensure 'bin' directory exists
+	$(CC) $(CFLAGS) -o $@ $(OBJECTS)
 
-# Rule for building object files
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	mkdir -p $(OBJDIR)  # Ensure 'bin' directory exists
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJDIR)/%.o: $(INCDIR)/%.cpp
-	mkdir -p $(OBJDIR)  # Ensure 'bin' directory exists
+# Build object files
+$(BINDIR)/%.o: $(SRCDIR)/%.cpp
+	mkdir -p $(BINDIR)  # Ensure 'bin' directory exists
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean rule
 clean:
-	rm -rf $(OBJDIR) $(TARGET)
+	rm -f $(BINDIR)/*.o $(TARGET)
 
 # Phony targets
-.PHONY: all clean
+.PHONY: all clean
