@@ -25,9 +25,9 @@ int main(int argc, char** argv){
     cout << "aviv eli goat";
 
     cout << "aviv eli goat";
+    int i=0;
+    Facility fac=Facility(name,settlementName,category,55,55,5,55);
+    cout << fac.getCost();
 
-    Facility fac=Facility(name,settlementName,category,10,0,0,0);
-    cout << "aviv eli goat";
-
-    cout << "aviv eli goat";
+    cout << fac.getLifeQualityScore();
 }
