@@ -1,6 +1,8 @@
 // #include "Simulation.h"
 // #include "Facility.h"
 #include "../include/Facility.h"
+#include "../include/Settlement.h"
+
 #include <iostream>
 
 using namespace std;
@@ -30,4 +32,8 @@ int main(int argc, char** argv){
     cout << fac.getCost();
 
     cout << fac.getLifeQualityScore();
+
+      cout << "aaab" << endl;
+    Settlement s1("Beer Sheva", SettlementType(1));
+    cout << s1.toString() << endl;
 }
