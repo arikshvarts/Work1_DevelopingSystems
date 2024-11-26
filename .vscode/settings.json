@@ -59,7 +59,13 @@
         "typeinfo": "cpp",
         "unordered_map": "cpp",
         "variant": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "memory_resource": "cpp",
+        "bit": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp",
+        "numeric": "cpp",
+        "random": "cpp"
     },
     "terminal.integrated.inheritEnv": false,
 }
