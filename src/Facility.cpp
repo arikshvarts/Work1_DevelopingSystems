@@ -78,7 +78,7 @@ Facility::Facility(const FacilityType &type, const string &settlementName)
     
     void Facility::setStatus(FacilityStatus status)
     {
-        this ->status = status;
+        status = status;
     }
 
 
