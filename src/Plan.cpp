@@ -6,39 +6,46 @@
 Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions)
     : plan_id(planId), facilityOptions(facilityOptions), selectionPolicy(selectionPolicy), settlement(settlement), facilities(vector<Facility *>()),
       underConstruction(vector<Facility *>()), life_quality_score(0), economy_score(0), environment_score(0), status(PlanStatus::AVALIABLE)
+{}
+
+Plan::Plan(const Plan &other):settlement(other.settlement),plan_id(other.plan_id),facilities(deepCopyFacilities(other.facilities)),underConstruction(deepCopyFacilities(other.underConstruction)),
+facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score), status(other.status),selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr)
+{}
+
+Plan::Plan(Plan &&other):settlement(other.settlement),plan_id(other.plan_id),facilities(deepCopyFacilities(other.facilities)),underConstruction(deepCopyFacilities(other.underConstruction)),
+facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score), status(other.status),selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr)
 {
-}
-Plan::Plan(const Plan &other):settlement(other.settlement),plan_id(other.plan_id),
-{
-    if (this != &other)
-    {
-        // clear();
-        plan_id = other.plan_id;
-        if (selectionPolicy)
-            delete selectionPolicy;
-        selectionPolicy = other.selectionPolicy ? other.selectionPolicy->clone() : nullptr;
-        facilities = other.facilities;
-        underConstruction = other.underConstruction;
-    }
-    return *this;
+other.selectionPolicy=nullptr;
 }
 
 Plan::~Plan()
 {
-    delete selectionPolicy; // check if implement here or in the settelement class itself.
+    delete selectionPolicy; 
     for (Facility *instance : underConstruction)
     {
-        delete instance;
+        delete instance;//deletes the object pointed to by the pointer
     }
     for (Facility *instance : facilities)
     {
-        delete instance;
+        delete instance;//deletes the object pointed to by the pointer
     }
+    facilities.clear();// Removes all pointers from the vector
+    underConstruction.clear();// Removes all pointers from the vector
 }
 
 const int Plan::getlifeQualityScore() const
 {
     return life_quality_score;
+}
+
+vector<Facility*> Plan::deepCopyFacilities(const vector<Facility*>& facilities)
+{
+    vector<Facility*> copiedFacilities;
+    for (Facility* facility : facilities)
+    {
+        copiedFacilities.push_back(facility ? facility->clone() : nullptr);
+    }
+    return copiedFacilities;
 }
 
 const int Plan::getEconomyScore() const
@@ -52,20 +59,34 @@ const int Plan::getEnvironmentScore() const
 }
 void Plan::setSelectionPolicy(SelectionPolicy *selectionPolicy)
 {
-    selectionPolicy = selectionPolicy;
+    this->selectionPolicy = selectionPolicy;
 }
 void Plan::step()
 {
     if (status == PlanStatus::AVALIABLE)
     {
-        // if selectionPolicy==
-        addFacility(fac)
+        while(status == PlanStatus::AVALIABLE)
+        {
+            FacilityType fac=this->selectionPolicy->selectFacility(facilityOptions);
+            addFacility(&(Facility(fac,settlement.getName())));
+        }
     }
-    for (const auto &instance : underConstruction)
-    { // Using auto& to avoid unnecessary copying
-        instance->timeLeft -= 1;
-        if (instance->getTimeLeft() == 0)
-            std::cout << instance.value << std::endl;
+    for (auto it = underConstruction.begin(); it != underConstruction.end(); )// here using * is to Derefere the pointers created because of the iterator. 
+    { 
+        // Using auto& to avoid unnecessary copying
+        (*it)->setTimeLeft( (*it)->getTimeLeft()-1);
+        if ((*it)->getTimeLeft() == 0)
+        {
+            (*it)->setStatus(FacilityStatus::OPERATIONAL);
+            // Move the instance to the facilities vector
+            facilities.push_back(*it);
+            // Remove the instance from underConstruction
+            it = underConstruction.erase(it);  // erase returns the next iterator
+        }
+        else
+        {
+            ++it;  // Move to the next element if the current one is not done
+        }
     }
 }
 void Plan::printStatus()

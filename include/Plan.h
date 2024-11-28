@@ -13,8 +13,11 @@ enum class PlanStatus {
 class Plan {
     public:
         Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions);
-        Plan& operator =(const Plan& other);
+        Plan(Plan &&other);
+        Plan(const Plan &other);
         ~Plan();
+        Plan& operator=(const Plan &other)=delete;
+        Plan& operator=(const Plan &&other)=delete;
         const int getlifeQualityScore() const;
         const int getEconomyScore() const;
         const int getEnvironmentScore() const;
@@ -24,7 +27,8 @@ class Plan {
         const vector<Facility*> &getFacilities() const;
         void addFacility(Facility* facility);
         const string toString() const;
-        
+        vector<Facility*> Plan::deepCopyFacilities(const vector<Facility*>& facilities);
+
 
 
 
