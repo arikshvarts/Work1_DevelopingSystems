@@ -30,4 +30,5 @@ int main(int argc, char** argv){
     cout << fac.getCost();
 
     cout << fac.getLifeQualityScore();
+    return 0;
 }
