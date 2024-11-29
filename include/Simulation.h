@@ -32,21 +32,6 @@ class Simulation {
         void close();
         void open();
 
-        // Getters
-        bool getIsRunning() const;
-        int getPlanCounter() const;
-        std::vector<BaseAction*> getActionsLog() const;
-        std::vector<Plan> getPlans() const;
-        std::vector<Settlement*> getSettlements() const;
-        std::vector<FacilityType> getFacilitiesOptions() const;
-
-        // Setters
-        void setIsRunning(bool running);
-        void setPlanCounter(int counter);
-        void setActionsLog(const std::vector<BaseAction*>& log);
-        void setPlans(const std::vector<Plan>& planList);
-        void setSettlements(const std::vector<Settlement*>& settlementList);
-        void setFacilitiesOptions(const std::vector<FacilityType>& options);
     private:
         bool isRunning;
         int planCounter; //For assigning unique plan IDs
