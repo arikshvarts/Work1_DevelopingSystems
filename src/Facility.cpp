@@ -47,8 +47,8 @@ FacilityCategory FacilityType::getCategory() const
 // {
 // }
 
-// Facility::Facility(const FacilityType &type, const string &settlementName)
-//     : FacilityType(type), settlementName(settlementName), status(FacilityStatus::UNDER_CONSTRUCTIONS), timeLeft(type.getCost()) {}
+Facility::Facility(const FacilityType &type, const string &settlementName)
+    : FacilityType(type), settlementName(settlementName), status(FacilityStatus::UNDER_CONSTRUCTIONS), timeLeft(type.getCost()) {}
 
 
 Facility* Facility::clone() const

@@ -36,7 +36,7 @@ class SimulateStep : public BaseAction {
         const string toString() const override;
         SimulateStep *clone() const override;
     private:
-        const int numOfSteps;
+        const int _numOfSteps;
 };
 
 class AddPlan : public BaseAction {

@@ -31,3 +31,7 @@ clean:
 
 # Phony targets
 .PHONY: all clean
+
+run: all
+	./$(TARGET)run: all
+	./$(TARGET)
