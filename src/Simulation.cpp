@@ -20,11 +20,12 @@ using std::vector;
 //   vector<Plan> plans;
 //   vector<Settlement*> settlements;
 //   vector<FacilityType> facilitiesOptions;
-Simulation::Simulation(const string &configFilePath)
-{
-
-}
-
+// Simulation::Simulation(const string &configFilePath);
+// Simulation::Simulation(const Simulation &sim);
+// Simulation::Simulation operator=(const Simulation &sim);
+// Simulation::Simulation(const Simulation &&sim);
+// Simulation::Simulation operator=(const Simulation &&sim);
+// ~Simulation::Simulation();
 void Simulation::start()
 {
     cout << "Simulation has started";
@@ -32,7 +33,7 @@ void Simulation::start()
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy)
 {
     plans.push_back(Plan(planCounter, settlement, selectionPolicy, facilitiesOptions));
-    setPlanCounter(getPlanCounter() + 1);
+    planCounter-=1;
 }
 void Simulation::addAction(BaseAction *action)
 {

@@ -1,4 +1,5 @@
-#include "Plan.h"
+#include "../include/Plan.h"
+#include "../include/Facility.h"
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -47,6 +48,10 @@ vector<Facility*> Plan::deepCopyFacilities(const vector<Facility*>& facilities)
     }
     return copiedFacilities;
 }
+const int Plan::getPlanId()
+{
+    return plan_id;
+}
 
 const int Plan::getEconomyScore() const
 {
@@ -68,7 +73,8 @@ void Plan::step()
         while(status == PlanStatus::AVALIABLE)
         {
             FacilityType fac=this->selectionPolicy->selectFacility(facilityOptions);
-            addFacility(&(Facility(fac,settlement.getName())));
+            Facility tempFacility(fac, settlement.getName());
+            addFacility(&tempFacility);
         }
     }
     for (auto it = underConstruction.begin(); it != underConstruction.end(); )// here using * is to Derefere the pointers created because of the iterator. 
@@ -77,6 +83,9 @@ void Plan::step()
         (*it)->setTimeLeft( (*it)->getTimeLeft()-1);
         if ((*it)->getTimeLeft() == 0)
         {
+            economy_score+=(*it)->getEconomyScore();
+            environment_score+=(*it)->getEnvironmentScore();
+            life_quality_score+=(*it)->getLifeQualityScore();
             (*it)->setStatus(FacilityStatus::OPERATIONAL);
             // Move the instance to the facilities vector
             facilities.push_back(*it);

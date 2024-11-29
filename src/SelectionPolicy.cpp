@@ -46,8 +46,14 @@ SustainabilitySelection::SustainabilitySelection():lastSelectedIndex(-1)
 
 const FacilityType &SustainabilitySelection::selectFacility(const vector<FacilityType> &facilitiesOptions)
 {
-    lastSelectedIndex=(lastSelectedIndex+1)%(facilitiesOptions.size());
-    return facilitiesOptions[lastSelectedIndex];
+    for (size_t i = lastSelectedIndex; i < facilitiesOptions.size(); ++i) {
+    
+        lastSelectedIndex=(lastSelectedIndex+1)%(facilitiesOptions.size());
+        if (facilitiesOptions[lastSelectedIndex].getCategory()==FacilityCategory::ENVIRONMENT)
+        {
+        return facilitiesOptions[lastSelectedIndex];
+        }
+}
 
 }
 
@@ -86,8 +92,14 @@ EconomySelection::EconomySelection():lastSelectedIndex(-1)
 
 const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> &facilitiesOptions)
 {
-    lastSelectedIndex=(lastSelectedIndex+1)%(facilitiesOptions.size());
-    return facilitiesOptions[lastSelectedIndex];
+    for (size_t i = lastSelectedIndex; i < facilitiesOptions.size(); ++i) {
+    
+        lastSelectedIndex=(lastSelectedIndex+1)%(facilitiesOptions.size());
+        if (facilitiesOptions[lastSelectedIndex].getCategory()==FacilityCategory::ECONOMY)
+        {
+        return facilitiesOptions[lastSelectedIndex];
+        }
+}
 }
 const string EconomySelection::toString() const
 {

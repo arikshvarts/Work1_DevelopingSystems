@@ -50,6 +50,7 @@ class Facility: public FacilityType {
         const int getTimeLeft() const;
         FacilityStatus step();
         void setStatus(FacilityStatus status);
+        void setTimeLeft(int timeLeft);
         const FacilityStatus& getStatus() const;
         const string toString() const;
 

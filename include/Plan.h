@@ -24,10 +24,11 @@ class Plan {
         void setSelectionPolicy(SelectionPolicy *selectionPolicy);
         void step();
         void printStatus();
+        const int getPlanId();
         const vector<Facility*> &getFacilities() const;
         void addFacility(Facility* facility);
         const string toString() const;
-        vector<Facility*> Plan::deepCopyFacilities(const vector<Facility*>& facilities);
+        vector<Facility*> deepCopyFacilities(const vector<Facility*>& facilities);
 
 
 
