@@ -100,6 +100,10 @@ void Simulation::open()
     isRunning=true;
 }
 
+const vector<Plan> Simulation:: getPlansVec() const {
+    return plans;
+}
+
 // void Simulation::printInitialState() const
 // {
 //     std::cout << "Simulation Initial State:" << std::endl;

@@ -31,6 +31,7 @@ class Simulation {
         void step();
         void close();
         void open();
+        const vector<Plan> getPlansVec() const; //we added new func for accessing the Plans vector in SimulateStep Action
 
     private:
         bool isRunning;
