@@ -1,4 +1,4 @@
-#include "./include/SelectionPolicy.h";
+#include "SelectionPolicy.h";
 #include <limits>
 #include <algorithm> // For std::max_element or min_element
 using namespace std;
