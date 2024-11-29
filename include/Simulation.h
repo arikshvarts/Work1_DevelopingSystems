@@ -4,6 +4,8 @@
 #include "Facility.h"
 #include "Plan.h"
 #include "Settlement.h"
+#include "Action.h"
+
 using std::string;
 using std::vector;
 using namespace std;
@@ -13,12 +15,12 @@ class SelectionPolicy;
 
 class Simulation {
     public:
-        // Simulation(const string &configFilePath);
-        // Simulation(const Simulation &sim);
-        // Simulation operator=(const Simulation &sim);
-        // Simulation(const Simulation &&sim);
-        // Simulation operator=(const Simulation &&sim);
-        // ~Simulation();
+        Simulation(const string &configFilePath);
+        Simulation(const Simulation &sim);
+        Simulation& operator=(const Simulation& sim);
+        Simulation(Simulation &&sim);
+        Simulation& operator=(Simulation &&sim);
+        ~Simulation();
         void start();
         void addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy);
         void addAction(BaseAction *action);
@@ -31,7 +33,7 @@ class Simulation {
         void step();
         void close();
         void open();
-        const vector<Plan> getPlansVec() const; //we added new func for accessing the Plans vector in SimulateStep Action
+        const vector<Plan>& getPlansVec() const; //we added new func for accessing the Plans vector in SimulateStep Action
 
     private:
         bool isRunning;

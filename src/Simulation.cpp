@@ -7,41 +7,200 @@
 #include "Simulation.h"
 #include <algorithm> // For std::find
 #include <iostream>
-
 using namespace std;
-
+#include <fstream>
+#include "Auxiliary.h"
 using std::string;
 using std::vector;
 
-//    private:
-//   bool isRunning;
-//  int planCounter; //For assigning unique plan IDs
-//  vector<BaseAction*> actionsLog;
-//   vector<Plan> plans;
-//   vector<Settlement*> settlements;
-//   vector<FacilityType> facilitiesOptions;
-// Simulation::Simulation(const string &configFilePath);
-// Simulation::Simulation(const Simulation &sim);
-// Simulation::Simulation operator=(const Simulation &sim);
-// Simulation::Simulation(const Simulation &&sim);
-// Simulation::Simulation operator=(const Simulation &&sim);
-// ~Simulation::Simulation();
+Simulation::Simulation(const string &configFilePath) : planCounter(0), isRunning(false)
+{
+    std::ifstream inputFile(configFilePath);
+
+    // Check if the file opened successfully
+    if (!inputFile.is_open())
+    {
+        cerr << "Error: Could not open the file " << configFilePath << std::endl;
+    }
+
+    std::string line;
+    while (getline(inputFile, line))
+    {
+        // Skip empty lines
+        if (line.empty())
+            continue;
+
+        vector<string> arguments = Auxiliary::parseArguments(line);
+        if (arguments[0] == "settlement")
+        {
+            Settlement *set = new Settlement(arguments[1], static_cast<SettlementType>(stoi(arguments[2])));
+            addSettlement(set);
+        }
+        else if (arguments[0] == "facility")
+        {
+            addFacility(Facility(arguments[1], arguments[2], static_cast<FacilityCategory>(stoi(arguments[3])), stoi(arguments[4]), stoi(arguments[5]), stoi(arguments[6]), stoi(arguments[7])));
+        }
+        else if (arguments[0] == "plan")
+        {
+            for (int i = 0; i < settlements.size(); ++i)
+            {
+                {
+                    if ((*settlements[i]).getName() == arguments[1])
+                    {
+                        if (arguments[2] == "nve")
+                        {
+                            addPlan(*settlements[i], new NaiveSelection());
+                        }
+                        else if (arguments[2] == "bal")
+                        {
+                            addPlan(*settlements[i], new BalancedSelection(0, 0, 0));
+                        }
+                        else if (arguments[2] == "eco")
+                        {
+                            addPlan(*settlements[i], new EconomySelection());
+                        }
+                        else if (arguments[2] == "env")
+                        {
+                            addPlan(*settlements[i], new SustainabilitySelection());
+                        }
+                        else
+                        {
+                            throw std::invalid_argument("Invalid policy type: " + arguments[2]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    inputFile.close(); // Close the file after processing
+}
+Simulation::Simulation(const Simulation &sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), plans(plans), facilitiesOptions(facilitiesOptions)
+{
+    for (auto ptr : sim.actionsLog)
+    {
+        actionsLog.push_back(ptr->clone()); // Allocate new object and copy data
+    }
+
+    // Then, deep copy the second vector (vec2)
+    for (auto ptr : sim.settlements)
+    {
+        settlements.push_back(new Settlement(*ptr));
+    }
+}
+Simulation &Simulation::operator=(const Simulation &sim)
+{
+    if (this != &sim)
+    {
+        // Clean up current resources (actionsLog and settlements)
+        for (auto ptr : actionsLog)
+        {
+            delete ptr;
+        }
+        actionsLog.clear();
+
+        for (auto ptr : settlements)
+        {
+            delete ptr;
+        }
+        settlements.clear();
+
+        // Deep copy the actionsLog
+        for (auto ptr : sim.actionsLog)
+        {
+            actionsLog.push_back(ptr->clone()); // Assuming clone() makes a deep copy
+        }
+
+        // Deep copy the settlements
+        for (auto ptr : sim.settlements)
+        {
+            settlements.push_back(new Settlement(*ptr)); // Assuming 'new' creates a deep copy
+        }
+
+        // Copy primitive members
+        isRunning = sim.isRunning;
+        plans.clear();
+
+        // Copy each Plan from the other Simulation
+        for (const auto& plan : sim.plans) {
+            plans.push_back(plan);  
+        }        facilitiesOptions = sim.facilitiesOptions;
+    }
+}
+Simulation::Simulation(Simulation &&sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), plans(sim.plans), facilitiesOptions(sim.facilitiesOptions), settlements(sim.settlements), actionsLog(sim.actionsLog)
+{
+    sim.actionsLog.clear();
+    sim.settlements.clear();
+}
+
+Simulation &Simulation::operator=(Simulation &&sim)
+{
+    if (this != &sim)
+    {
+        // Clean up current resources (actionsLog and settlements)
+        for (auto ptr : actionsLog)
+        {
+            delete ptr;
+        }
+        actionsLog.clear();
+
+        for (auto ptr : settlements)
+        {
+            delete ptr;
+        }
+        settlements.clear();
+
+        // Transfer ownership of resources from 'sim' to 'this'
+        actionsLog = move(sim.actionsLog);               // Move the vector of actions (no deep copy, just ownership transfer)
+        settlements = move(sim.settlements);             // Move the vector of settlements (ownership transfer)
+        plans = move(sim.plans);                         // Move the plans vector
+        facilitiesOptions = move(sim.facilitiesOptions); // Move the facilities options vector
+
+        // Transfer other data members
+        isRunning = sim.isRunning;
+        planCounter = sim.planCounter;
+
+        sim.actionsLog.clear();
+        sim.settlements.clear();
+        sim.plans.clear();
+        sim.facilitiesOptions.clear();
+    }
+}
+
+Simulation::~Simulation()
+{
+    for (auto ptr : actionsLog)
+    {
+        delete ptr;
+    }
+    actionsLog.clear();
+
+    for (auto ptr : settlements)
+    {
+        delete ptr;
+    }
+    settlements.clear();
+}
 void Simulation::start()
 {
     cout << "Simulation has started";
+    // not fully implemented yet
 }
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy)
 {
     plans.push_back(Plan(planCounter, settlement, selectionPolicy, facilitiesOptions));
-    planCounter-=1;
+    planCounter += 1;
 }
 void Simulation::addAction(BaseAction *action)
 {
-    actionsLog.push_back(action);
+    if (action != nullptr)
+        actionsLog.push_back(action);
 }
 bool Simulation::addSettlement(Settlement *settlement)
 {
-    settlements.push_back(settlement);
+    if (!isSettlementExists(settlement->getName()))
+    {
+        settlements.push_back(settlement);
+    }
 }
 bool Simulation::addFacility(FacilityType facility)
 {
@@ -89,18 +248,15 @@ void Simulation::step()
 }
 void Simulation::close()
 {
-    for (auto &pl : plans)
-    {
-        cout << pl.toString();
-    }
     isRunning = false;
 }
 void Simulation::open()
 {
-    isRunning=true;
+    isRunning = true;
 }
 
-const vector<Plan> Simulation:: getPlansVec() const {
+const vector<Plan> &Simulation::getPlansVec() const
+{
     return plans;
 }
 
