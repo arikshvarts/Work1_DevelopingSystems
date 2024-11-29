@@ -24,7 +24,7 @@ class BaseAction{
         const string &getErrorMsg() const;
 
     private:
-        string errorMsg;
+        string _errorMsg;
         ActionStatus status;
 };
 
@@ -46,8 +46,8 @@ class AddPlan : public BaseAction {
         const string toString() const override;
         AddPlan *clone() const override;
     private:
-        const string settlementName;
-        const string selectionPolicy;
+        const string _settlementName;
+        const string _selectionPolicy;
 };
 
 
@@ -58,8 +58,8 @@ class AddSettlement : public BaseAction {
         AddSettlement *clone() const override;
         const string toString() const override;
     private:
-        const string settlementName;
-        const SettlementType settlementType;
+        const string _settlementName;
+        const SettlementType _settlementType;
 };
 
 
@@ -71,12 +71,12 @@ class AddFacility : public BaseAction {
         AddFacility *clone() const override;
         const string toString() const override;
     private:
-        const string facilityName;
-        const FacilityCategory facilityCategory;
-        const int price;
-        const int lifeQualityScore;
-        const int economyScore;
-        const int environmentScore;
+        const string _facilityName;
+        const FacilityCategory _facilityCategory;
+        const int _price;
+        const int _lifeQualityScore;
+        const int _economyScore;
+        const int _environmentScore;
 
 };
 

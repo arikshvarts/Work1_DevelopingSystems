@@ -1,8 +1,8 @@
 #include <string>
 #include <vector>
 #include "../include/Action.h"
-enum class SettlementType;
-enum class FacilityCategory;
+#include <iostream>
+
 
 
     BaseAction :: BaseAction(){}
@@ -10,13 +10,14 @@ enum class FacilityCategory;
         return status; // returns 0/1 and not COMPLETED/ERROR
     }
     void BaseAction :: complete(){
-        //status = 0; //need to check syntex
+        status = ActionStatus::COMPLETED;
     }
     void BaseAction :: error(string errorMsg){
-        this->errorMsg = errorMsg; //need to check if it is really field=paramater? 
+        status = ActionStatus :: ERROR;
+        _errorMsg = errorMsg;
     }
     const string &BaseAction :: getErrorMsg() const{
-        return errorMsg;
+        return _errorMsg;
     }
 
 
@@ -38,12 +39,32 @@ enum class FacilityCategory;
         }
    
 
-    AddPlan :: AddPlan(const string &settlementName, const string &selectionPolicy) {}
+    AddPlan :: AddPlan(const string &settlementName, const string &selectionPolicy) : _settlementName(settlementName), _selectionPolicy(selectionPolicy){}
     void AddPlan :: act(Simulation &simulation){
-        //livdokv lehashlim how initialize refernece
+        if(simulation.isSettlementExists(_settlementName) == true){
+            SelectionPolicy* policy; //declare police without initalize, initalize only when we 
+            if(_selectionPolicy == "nve") {policy = new NaiveSelection();}
+            //else if(_selectionPolicy == "bal") {policy = new BalancedSelection(simulation.getPlan().getlifeQualityScore(),simulation.getPlan().getEconomyScore(),simulation.getPlan().getEnvironmentScore());}
+            //livdok how to enter tho 3scores to the  new BalancedSelection
+            else if(_selectionPolicy == "eco") {policy = new EconomySelection();} 
+            else if(_selectionPolicy == "env") {policy = new  SustainabilitySelection();} 
+            else{
+                error("no such a Selection Policy");
+                    cout << "ERROR: " + getErrorMsg();
+                    return; //breaks the function, doesnt continue
+                }            
+            simulation.addPlan(simulation.getSettlement(_settlementName), policy);        
+        }
+        else{   //if there is no such settlement name
+            error("no such a Settlement name");
+                cout << "ERROR: " + getErrorMsg();
+                return; //breaks the function, doesnt continue        
+        }
+        complete();
     }
     const string AddPlan :: toString() const{
-        return ".";
+        
+        return "Added a new Plan to " + _settlementName + "settlemnt, with " + _selectionPolicy + " Policy";
     }
     AddPlan* AddPlan :: clone() const{
         return new AddPlan(*this);
@@ -51,34 +72,33 @@ enum class FacilityCategory;
 
     }
 
-// class AddSettlement : public BaseAction {
-//     public:
-//         AddSettlement(const string &settlementName,SettlementType settlementType);
-//         void act(Simulation &simulation) override;
-//         AddSettlement *clone() const override;
-//         const string toString() const override;
-//     private:
-//         const string settlementName;
-//         const SettlementType settlementType;
-// };
+    AddSettlement :: AddSettlement(const string &settlementName,SettlementType settlementType): _settlementName(settlementName), _settlementType(settlementType){}
+    void AddSettlement :: act(Simulation &simulation){
+        simulation.addSettlement(new Settlement(_settlementName, _settlementType)); //asks for pointer
+        complete();
+    }
+        AddSettlement* AddSettlement :: clone() const{
+                    return new AddSettlement(*this);
+        //this method return a pointer to a new AddSettlement object with the same details
+        }
+    const string AddSettlement :: toString() const{
+        string types[3] = {"Village","City", "Metropolin"};
+        return "Added a new Settlement: " + _settlementName + " from type: " + types[int(_settlementType)];
+    }
 
 
-
-// class AddFacility : public BaseAction {
-//     public:
-//         AddFacility(const string &facilityName, const FacilityCategory facilityCategory, const int price, const int lifeQualityScore, const int economyScore, const int environmentScore);
-//         void act(Simulation &simulation) override;
-//         AddFacility *clone() const override;
-//         const string toString() const override;
-//     private:
-//         const string facilityName;
-//         const FacilityCategory facilityCategory;
-//         const int price;
-//         const int lifeQualityScore;
-//         const int economyScore;
-//         const int environmentScore;
-
-// };
+        AddFacility :: AddFacility(const string &facilityName, const FacilityCategory facilityCategory, const int price, const int lifeQualityScore, const int economyScore, const int environmentScore)
+        :_facilityName(facilityName), _facilityCategory(facilityCategory), _price(price), _lifeQualityScore(lifeQualityScore), _economyScore(economyScore), _environmentScore(environmentScore){}
+        void AddFacility :: act(Simulation &simulation){
+            FacilityType facToAdd(_facilityName, _facilityCategory, _price, _lifeQualityScore, _economyScore, _environmentScore);
+            simulation.addFacility(facToAdd); //asks for object
+            complete();
+        }
+        AddFacility* AddFacility :: clone() const{
+            return new AddFacility(*this);
+            //this method return a pointer to a new AddSettlement object with the same details
+        }
+        const string AddFacility :: toString() const{}
 
 // class PrintPlanStatus: public BaseAction {
 //     public:
