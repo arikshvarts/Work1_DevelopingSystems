@@ -73,7 +73,7 @@ void Plan::step()
         while(status == PlanStatus::AVALIABLE)
         {
             FacilityType fac=this->selectionPolicy->selectFacility(facilityOptions);
-            Facility tempFacility(fac, settlement.getName());
+            Facility tempFacility=Facility(fac, settlement.getName());
             addFacility(&tempFacility);
         }
     }
