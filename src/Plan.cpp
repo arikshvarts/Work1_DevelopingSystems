@@ -11,12 +11,15 @@ Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *sele
 
 Plan::Plan(const Plan &other):settlement(other.settlement),plan_id(other.plan_id),facilities(deepCopyFacilities(other.facilities)),underConstruction(deepCopyFacilities(other.underConstruction)),
 facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score), status(other.status),selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr)
-{}
+{
+}
 
 Plan::Plan(Plan &&other):settlement(other.settlement),plan_id(other.plan_id),facilities(deepCopyFacilities(other.facilities)),underConstruction(deepCopyFacilities(other.underConstruction)),
 facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score), status(other.status),selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr)
 {
 other.selectionPolicy=nullptr;
+other.facilities.clear();
+other.underConstruction.clear();
 }
 
 Plan::~Plan()
@@ -77,25 +80,32 @@ void Plan::step()
             addFacility(&tempFacility);
         }
     }
-    for (auto it = underConstruction.begin(); it != underConstruction.end(); )// here using * is to Derefere the pointers created because of the iterator. 
+    for (int it = 0; it < underConstruction.size();) 
     { 
         // Using auto& to avoid unnecessary copying
-        (*it)->setTimeLeft( (*it)->getTimeLeft()-1);
-        if ((*it)->getTimeLeft() == 0)
+        underConstruction[it]->step();
+        if (underConstruction[it]->getTimeLeft() == 0)
         {
-            economy_score+=(*it)->getEconomyScore();
-            environment_score+=(*it)->getEnvironmentScore();
-            life_quality_score+=(*it)->getLifeQualityScore();
-            (*it)->setStatus(FacilityStatus::OPERATIONAL);
+            economy_score+=underConstruction[it]->getEconomyScore();
+            environment_score+=underConstruction[it]->getEnvironmentScore();
+            life_quality_score+=underConstruction[it]->getLifeQualityScore();
+            underConstruction[it]->setStatus(FacilityStatus::OPERATIONAL);
             // Move the instance to the facilities vector
-            facilities.push_back(*it);
+            facilities.push_back(underConstruction[it]);
             // Remove the instance from underConstruction
-            it = underConstruction.erase(it);  // erase returns the next iterator
+            underConstruction.erase(underConstruction.begin() + it);
         }
         else
         {
-            ++it;  // Move to the next element if the current one is not done
+            it+=1;
         }
+    }
+    if (underConstruction.size()==int(settlement.getType()))
+    {
+    status =PlanStatus::BUSY;
+    }
+    else{
+        status=PlanStatus::AVALIABLE;
     }
 }
 void Plan::printStatus()
