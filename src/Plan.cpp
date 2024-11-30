@@ -118,7 +118,7 @@ void Plan::printStatus()
         cout << "BUSY";
     }
 }
-const vector<Facility *> &Plan::getFacilities() const // returned by refernce to ebable modification
+vector<Facility *> &Plan::getFacilities() // returned by refernce to ebable modification
 {
     return facilities;
 }
@@ -145,5 +145,3 @@ const Settlement& Plan :: getSettlement() const{
 const SelectionPolicy& Plan :: getSelectionPolicy() const{
     return *selectionPolicy;
 }
-
-const bool IsPlanExist() const

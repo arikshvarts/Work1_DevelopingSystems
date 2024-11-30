@@ -146,9 +146,9 @@ const string AddFacility ::toString() const {}
             cout << endl;
             cout << p.getSelectionPolicy().toString();
             cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
-            vector<Facility>& facilities = p.getFacilities();
-            for(Facility fac: facilities) {
-                cout << fac.toString() << endl;
+            vector<Facility*>& facilities = p.getFacilities();
+            for(Facility* fac: facilities) {
+                cout << fac->toString() << endl;
             }
         }
         else{

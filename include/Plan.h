@@ -25,7 +25,7 @@ class Plan {
         void step();
         void printStatus();
         const int getPlanId();
-        const vector<Facility*> &getFacilities() const;
+        vector<Facility*> &getFacilities();
         void addFacility(Facility* facility);
         const string toString() const;
         vector<Facility*> deepCopyFacilities(const vector<Facility*>& facilities);
