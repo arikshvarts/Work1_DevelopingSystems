@@ -122,15 +122,20 @@ AddFacility *AddFacility ::clone() const
 }
 const string AddFacility ::toString() const {}
 
-// class PrintPlanStatus: public BaseAction {
-//     public:
-//         PrintPlanStatus(int planId);
-//         void act(Simulation &simulation) override;
-//         PrintPlanStatus *clone() const override;
-//         const string toString() const override;
-//     private:
-//         const int planId;
-// };
+    PrintPlanStatus :: PrintPlanStatus(int planId): _planId(planId){}
+    void PrintPlanStatus :: act(Simulation &simulation){
+        Plan &p = simulation.getPlan(_planId); //create a new reference to the plan that getPlan returns,more efficient no need to copy the whole object
+        cout <<"Plan ID: " + to_string(_planId) + "     Settlement name:" + p.getSettlement().getName() << endl;
+        cout <<"Plan Status: ";
+        p.printStatus();
+        cout << endl;
+        cout << p.getSelectionPolicy().toString();
+        cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
+        //didnt finish yettt
+    }
+    PrintPlanStatus* PrintPlanStatus :: clone() const{}
+    const string PrintPlanStatus :: toString() const{}
+
 
 // class ChangePlanPolicy : public BaseAction {
 //     public:

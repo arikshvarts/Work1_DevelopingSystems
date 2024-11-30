@@ -137,3 +137,11 @@ const string Plan::toString() const
     oss << "Name: " << plan_id << ", SettlementName: " << settlement.getName() << ", getEnvScore: " << getEnvironmentScore() << "getEconScore: " << getEconomyScore() << "getlifeQualScore: " << getlifeQualityScore();
     return oss.str();
 }
+
+const Settlement& Plan :: getSettlement() const{
+    return settlement;
+}
+
+const SelectionPolicy& Plan :: getSelectionPolicy() const{
+    return *selectionPolicy;
+}

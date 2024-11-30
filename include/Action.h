@@ -87,7 +87,7 @@ class PrintPlanStatus: public BaseAction {
         PrintPlanStatus *clone() const override;
         const string toString() const override;
     private:
-        const int planId;
+        const int _planId;
 };
 
 

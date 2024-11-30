@@ -40,7 +40,7 @@ isRunning(false)
             addFacility(Facility(arguments[1], arguments[2], static_cast<FacilityCategory>(stoi(arguments[3])), stoi(arguments[4]), stoi(arguments[5]), stoi(arguments[6]), stoi(arguments[7])));
         }
         else if (arguments[0] == "plan")
-        {
+        { 
             for (int i = 0; i < settlements.size(); ++i)
             {
                 {
