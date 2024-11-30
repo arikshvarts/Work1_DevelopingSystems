@@ -1,18 +1,16 @@
 #include <string>
 #include <vector>
-// #include "/Facility.h"
-// #include "Plan.h"
-// #include "Settlement.h"
 #include "../include/Simulation.h"
-#include <algorithm> // For std::find
+#include "../include/Auxiliary.h"
+#include "../include/Action.h"
+
+#include <algorithm>
 #include <iostream>
 #include <fstream>
-// #include "Auxiliary.h"
 using namespace std;
 
-/
-    Simulation::Simulation(const string &configFilePath) : planCounter(0),
-isRunning(false)
+Simulation::Simulation(const string &configFilePath) : planCounter(0),
+                                                       isRunning(false)
 {
     std::ifstream inputFile(configFilePath);
 
@@ -40,7 +38,7 @@ isRunning(false)
             addFacility(Facility(arguments[1], arguments[2], static_cast<FacilityCategory>(stoi(arguments[3])), stoi(arguments[4]), stoi(arguments[5]), stoi(arguments[6]), stoi(arguments[7])));
         }
         else if (arguments[0] == "plan")
-        { 
+        {
             for (int i = 0; i < settlements.size(); ++i)
             {
                 {
@@ -246,7 +244,7 @@ void Simulation::start()
         }
         else if (args[0] == "changePolicy")
         {
-            changePolicy action = changePolicy();
+            ChangePlanPolicy action = ChangePlanPolicy();
             action.act(*this);
             addAction(&action);
         }
@@ -322,7 +320,7 @@ void Simulation::open()
     isRunning = true;
 }
 
-const vector<Plan> &Simulation::getPlansVec() const
+vector<Plan> &Simulation::getPlansVec() 
 {
     return plans;
 }
@@ -364,12 +362,14 @@ void Simulation::printInitialState() const
         }
     }
 }
-Simulation *Simulation::clone() const;
-
+Simulation *Simulation::clone() const
 {
     return new Simulation(*this); // Use copy constructor to create a deep copy
 }
-
+vector<BaseAction *>  Simulation::getActionsLog() const
+{
+    return actionsLog;
+}
 const bool Simulation:: IsPlanExist(const int planID) const{
     bool to_ret = false;
     for (auto &pl : plans)

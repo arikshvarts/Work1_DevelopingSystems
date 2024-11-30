@@ -4,10 +4,8 @@
 #include "Facility.h"
 #include "Plan.h"
 #include "Settlement.h"
-#include "Action.h"
 
-using std::string;
-using std::vector;
+
 using namespace std;
 
 class BaseAction;
@@ -30,14 +28,14 @@ class Simulation {
         Settlement &getSettlement(const string &settlementName);
         Plan &getPlan(const int planID);
         void printInitialState() const;
+        vector<BaseAction *> getActionsLog() const;
         Simulation* clone() const;
         void step();
         void close();
         void open();
-        const vector<Plan>& getPlansVec() const; //we added new func for accessing the Plans vector in SimulateStep Action
+        vector<Plan>& getPlansVec(); //we added new func for accessing the Plans vector in SimulateStep Action
         const bool IsPlanExist(const int planID) const;
         const bool IsFacilityExist(const string Fac_Name) const;        
-
     private:
         bool isRunning;
         int planCounter; //For assigning unique plan IDs

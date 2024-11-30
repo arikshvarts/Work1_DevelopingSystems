@@ -1,13 +1,14 @@
-#pragma once
 #include <string>
 #include <vector>
 #include "Simulation.h"
+
 enum class SettlementType;
 enum class FacilityCategory;
 
 enum class ActionStatus{
     COMPLETED, ERROR
 };
+
 class BaseAction{
     public:
         BaseAction();
@@ -21,6 +22,7 @@ class BaseAction{
         void complete();
         void error(string errorMsg);
         const string &getErrorMsg() const;
+        
 
 
     private:

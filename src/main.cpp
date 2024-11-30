@@ -1,6 +1,6 @@
 #include "../include/Facility.h"
 #include "../include/Settlement.h"
-// #include "../include/Simulation.h"
+#include "../include/Simulation.h"
 
 #include <iostream>
 using namespace std;
@@ -33,8 +33,8 @@ int main(int argc, char** argv){
     cout << fac.getCost();
 
     cout << fac.getLifeQualityScore();
-    // Simulation simulation("config_file.txt");
-    // simulation.printInitialState();
-    // simulation.start();
+    Simulation simulation("config_file.txt");
+    simulation.printInitialState();
+    simulation.start();
     return 0;
 }
