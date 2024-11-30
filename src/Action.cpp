@@ -10,6 +10,7 @@ ActionStatus BaseAction ::getStatus() const
 {
     return status; // returns 0/1 and not COMPLETED/ERROR
 }
+
 void BaseAction ::complete()
 {
     status = ActionStatus::COMPLETED;

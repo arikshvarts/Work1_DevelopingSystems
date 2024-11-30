@@ -19,10 +19,9 @@ enum class FacilityCategory {
 
 class FacilityType {
     public:
-        FacilityType()=default;
         FacilityType(const string &name, const FacilityCategory category, const int price, const int lifeQuality_score, const int economy_score, const int environment_score);
         FacilityType(const FacilityType &other);
-        FacilityType& operator=(const FacilityType&);
+        // FacilityType& operator=(const FacilityType& other);
 
         const string &getName() const;
         int getCost() const;
