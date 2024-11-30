@@ -11,7 +11,7 @@ enum class ActionStatus{
 
 class BaseAction{
     public:
-        BaseAction();
+        BaseAction()=default;
         ActionStatus getStatus() const;
         virtual void act(Simulation& simulation)=0;
         virtual const string toString() const=0;

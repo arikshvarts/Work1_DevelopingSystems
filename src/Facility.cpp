@@ -15,6 +15,10 @@ FacilityType::FacilityType(const FacilityType &other)
     : name(other.name), category(other.category), price(other.price), lifeQuality_score(other.lifeQuality_score), economy_score(other.economy_score), environment_score(other.environment_score)
 {
 }
+// FacilityType& operator=(const FacilityType& other)
+// {
+
+// }
 
 const string &FacilityType::getName() const
 {
