@@ -145,3 +145,5 @@ const Settlement& Plan :: getSettlement() const{
 const SelectionPolicy& Plan :: getSelectionPolicy() const{
     return *selectionPolicy;
 }
+
+const bool IsPlanExist() const

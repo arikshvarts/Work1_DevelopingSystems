@@ -35,6 +35,8 @@ class Simulation {
         void close();
         void open();
         const vector<Plan>& getPlansVec() const; //we added new func for accessing the Plans vector in SimulateStep Action
+        const bool IsPlanExist(const int planID) const;
+        const bool IsFacilityExist(const string Fac_Name) const;        
 
     private:
         bool isRunning;

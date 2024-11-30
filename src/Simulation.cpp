@@ -369,3 +369,23 @@ Simulation *Simulation::clone() const;
 {
     return new Simulation(*this); // Use copy constructor to create a deep copy
 }
+
+const bool Simulation:: IsPlanExist(const int planID) const{
+    bool to_ret = false;
+    for (auto &pl : plans)
+    {
+        if (pl.getPlanId() == planID)
+        {
+            return true;
+        }
+    }
+    return to_ret;
+}
+
+const bool Simulation:: IsFacilityExist(const string fac_Name) const{
+    bool to_ret = false;
+    for(FacilityType fac : facilitiesOptions){
+        if(fac.getName == fac_Name){return true;}
+    }
+    return to_ret;
+}       
