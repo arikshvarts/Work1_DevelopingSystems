@@ -1,19 +1,18 @@
-#pragma once
 #include <string>
 #include <vector>
-#include "Facility.h"
-#include "Plan.h"
-#include "Settlement.h"
-#include "Simulation.h"
+// #include "/Facility.h"
+// #include "Plan.h"
+// #include "Settlement.h"
+#include "../include/Simulation.h"
 #include <algorithm> // For std::find
 #include <iostream>
-using namespace std;
 #include <fstream>
-#include "Auxiliary.h"
-using std::string;
-using std::vector;
+// #include "Auxiliary.h"
+using namespace std;
 
-Simulation::Simulation(const string &configFilePath) : planCounter(0), isRunning(false)
+/
+    Simulation::Simulation(const string &configFilePath) : planCounter(0),
+isRunning(false)
 {
     std::ifstream inputFile(configFilePath);
 
@@ -121,9 +120,11 @@ Simulation &Simulation::operator=(const Simulation &sim)
         plans.clear();
 
         // Copy each Plan from the other Simulation
-        for (const auto& plan : sim.plans) {
-            plans.push_back(plan);  
-        }        facilitiesOptions = sim.facilitiesOptions;
+        for (const auto &plan : sim.plans)
+        {
+            plans.push_back(plan);
+        }
+        facilitiesOptions = sim.facilitiesOptions;
     }
 }
 Simulation::Simulation(Simulation &&sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), plans(sim.plans), facilitiesOptions(sim.facilitiesOptions), settlements(sim.settlements), actionsLog(sim.actionsLog)
@@ -183,7 +184,73 @@ Simulation::~Simulation()
 void Simulation::start()
 {
     cout << "Simulation has started";
-    // not fully implemented yet
+    open();
+    while (isRunning)
+    {
+        string input;
+        getline(cin, input);
+        vector<string> args = Auxiliary::parseArguments(input);
+        if (args[0] == "plan")
+        {
+            AddPlan action = AddPlan(args[1], args[2]);
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "planStatus")
+        {
+            PrintPlanStatus action = PrintPlanStatus(stoi(args[1]));
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "facility")
+        {
+            AddFacility action = AddFacility(args[1], static_cast<FacilityCategory>(stoi(args[2])), stoi(args[3]), stoi(args[4]), stoi(args[5]), stoi(args[6]));
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "backup")
+        {
+            BackupSimulation action = BackupSimulation();
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "log")
+        {
+            PrintActionsLog action = PrintActionsLog();
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "settlement")
+        {
+            AddSettlement action = AddSettlement(args[1], static_cast<SettlementType>(stoi(args[2])));
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "step")
+        {
+            SimulateStep action = SimulateStep(stoi(args[1]));
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "restore")
+        {
+            RestoreSimulation action = RestoreSimulation();
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "close")
+        {
+            Close action = Close();
+            action.act(*this);
+            addAction(&action);
+        }
+        else if (args[0] == "changePolicy")
+        {
+            changePolicy action = changePolicy();
+            action.act(*this);
+            addAction(&action);
+        }
+    }
 }
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy)
 {
@@ -260,40 +327,45 @@ const vector<Plan> &Simulation::getPlansVec() const
     return plans;
 }
 
-// void Simulation::printInitialState() const
-// {
-//     std::cout << "Simulation Initial State:" << std::endl;
-//     std::cout << "isRunning: " << (isRunning ? "true" : "false") << std::endl;
-//     std::cout << "planCounter: " << planCounter << std::endl;
+void Simulation::printInitialState() const
+{
+    std::cout << "Simulation Initial State:" << std::endl;
+    std::cout << "isRunning: " << (isRunning ? "true" : "false") << std::endl;
+    std::cout << "planCounter: " << planCounter << std::endl;
 
-//     std::cout << "Settlements:" << std::endl;
-//     if (settlements.empty())
-//     {
-//         std::cout << "  None" << std::endl;
-//     }
-//     else
-//     {
-//         for (const auto &settlement : settlements)
-//         {
-//             std::cout << settlement->toString() << std::endl;
-//         }
-//     }
+    std::cout << "Settlements:" << std::endl;
+    if (settlements.empty())
+    {
+        std::cout << "  None" << std::endl;
+    }
+    else
+    {
+        for (const auto &settlement : settlements)
+        {
+            std::cout << settlement->toString() << std::endl;
+        }
+    }
 
-//     std::cout << "Facilities Options:" << std::endl;
-//     if (facilitiesOptions.empty())
-//     {
-//         std::cout << "  None" << std::endl;
-//     }
-//     else
-//     {
-//         for (const auto &facility : facilitiesOptions)
-//         {
-//             std::cout << "  Name: " << facility.getName()
-//                       << " , Category: " << int(facility.getCategory()) << "\n"
-//                       << ", Price: " << facility.getCost()
-//                       << ", Life Quality Score: " << facility.getLifeQualityScore()
-//                       << ", Economy Score: " << facility.getEconomyScore()
-//                       << ", Environment Score: " << facility.getEnvironmentScore() << std::endl;
-//                       }
-//                       }
-// }
+    std::cout << "Facilities Options:" << std::endl;
+    if (facilitiesOptions.empty())
+    {
+        std::cout << "  None" << std::endl;
+    }
+    else
+    {
+        for (const auto &facility : facilitiesOptions)
+        {
+            std::cout << "  Name: " << facility.getName()
+                      << " , Category: " << int(facility.getCategory()) << "\n"
+                      << ", Price: " << facility.getCost()
+                      << ", Life Quality Score: " << facility.getLifeQualityScore()
+                      << ", Economy Score: " << facility.getEconomyScore()
+                      << ", Environment Score: " << facility.getEnvironmentScore() << std::endl;
+        }
+    }
+}
+Simulation *Simulation::clone() const;
+
+{
+    return new Simulation(*this); // Use copy constructor to create a deep copy
+}
