@@ -92,8 +92,15 @@ AddPlan *AddPlan ::clone() const
 AddSettlement ::AddSettlement(const string &settlementName, SettlementType settlementType) : _settlementName(settlementName), _settlementType(settlementType) {}
 void AddSettlement ::act(Simulation &simulation)
 {
-    simulation.addSettlement(new Settlement(_settlementName, _settlementType)); // asks for pointer
-    complete();
+    if(simulation.isSettlementExists(_settlementName) == false){
+        simulation.addSettlement(new Settlement(_settlementName, _settlementType)); // asks for pointer
+        complete();
+    }
+    else{
+        error("Settlement already exists");
+        cout << "ERROR: " + getErrorMsg();
+        return; // breaks the function, doesnt continue
+    }
 }
 AddSettlement *AddSettlement ::clone() const
 {
@@ -110,9 +117,16 @@ AddFacility ::AddFacility(const string &facilityName, const FacilityCategory fac
     : _facilityName(facilityName), _facilityCategory(facilityCategory), _price(price), _lifeQualityScore(lifeQualityScore), _economyScore(economyScore), _environmentScore(environmentScore) {}
 void AddFacility ::act(Simulation &simulation)
 {
-    FacilityType facToAdd(_facilityName, _facilityCategory, _price, _lifeQualityScore, _economyScore, _environmentScore);
-    simulation.addFacility(facToAdd); // asks for object
-    complete();
+    if(simulation.IsFacilityExist(_facilityName) == false){
+        FacilityType facToAdd(_facilityName, _facilityCategory, _price, _lifeQualityScore, _economyScore, _environmentScore);
+        simulation.addFacility(facToAdd); // asks for object
+        complete();
+    }
+    else{
+        error("Facility already exists ");
+        cout << "ERROR: " + getErrorMsg();
+        return; // breaks the function, doesnt continue        
+    }
 }
 AddFacility *AddFacility ::clone() const
 {
@@ -121,20 +135,35 @@ AddFacility *AddFacility ::clone() const
 }
 const string AddFacility ::toString() const {}
 
-PrintPlanStatus ::PrintPlanStatus(int planId) : _planId(planId) {}
-void PrintPlanStatus ::act(Simulation &simulation)
-{
-    Plan &p = simulation.getPlan(_planId); // create a new reference to the plan that getPlan returns,more efficient no need to copy the whole object
-    cout << "Plan ID: " + to_string(_planId) + "     Settlement name:" + p.getSettlement().getName() << endl;
-    cout << "Plan Status: ";
-    p.printStatus();
-    cout << endl;
-    cout << p.getSelectionPolicy().toString();
-    cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
-    // didnt finish yettt
-}
-PrintPlanStatus *PrintPlanStatus ::clone() const {}
-const string PrintPlanStatus ::toString() const {}
+    PrintPlanStatus :: PrintPlanStatus(int planId): _planId(planId){}
+    void PrintPlanStatus :: act(Simulation &simulation){
+        if(simulation.IsPlanExist(_planId) == true){
+            Plan &p = simulation.getPlan(_planId); //create a new reference to the plan that getPlan returns,more efficient no need to copy the whole object
+            cout <<"Plan ID: " + to_string(_planId) + "     Settlement name:" + p.getSettlement().getName() << endl;
+            cout <<"Plan Status: ";
+            p.printStatus();
+            cout << endl;
+            cout << p.getSelectionPolicy().toString();
+            cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
+            vector<Facility>& facilities = p.getFacilities();
+            for(Facility fac: facilities) {
+                cout << fac.toString() << endl;
+            }
+        }
+        else{
+            error("Plan ID doesn't exist");
+            cout << "ERROR: " + getErrorMsg();
+            return; // breaks the function, doesnt continue
+        }
+    }
+    PrintPlanStatus* PrintPlanStatus :: clone() const{
+            return new PrintPlanStatus(*this);
+    // this method return a pointer to a new PrintPlanStatus object with the same details
+    }
+    const string PrintPlanStatus :: toString() const{
+        cout << "Printed Plan Status" ;
+    }
+
 
 class ChangePlanPolicy : public BaseAction {
     public:
