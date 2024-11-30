@@ -30,6 +30,7 @@ class Simulation {
         Settlement &getSettlement(const string &settlementName);
         Plan &getPlan(const int planID);
         void printInitialState() const;
+        Simulation* clone() const;
         void step();
         void close();
         void open();

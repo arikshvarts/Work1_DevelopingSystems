@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-#include "Facility.h"
+#include "../include/Facility.h"
 #include <sstream>
 using std::string;
 using std::vector;
@@ -15,6 +15,7 @@ FacilityType::FacilityType(const FacilityType &other)
     : name(other.name), category(other.category), price(other.price), lifeQuality_score(other.lifeQuality_score), economy_score(other.economy_score), environment_score(other.environment_score)
 {
 }
+
 const string &FacilityType::getName() const
 {
     return name;

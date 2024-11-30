@@ -8,7 +8,6 @@ enum class FacilityCategory;
 enum class ActionStatus{
     COMPLETED, ERROR
 };
-
 class BaseAction{
     public:
         BaseAction();
@@ -22,6 +21,7 @@ class BaseAction{
         void complete();
         void error(string errorMsg);
         const string &getErrorMsg() const;
+
 
     private:
         string _errorMsg;
