@@ -2,9 +2,8 @@
 #include <vector>
 #include "../include/Action.h"
 #include "../include/SelectionPolicy.h"
-
 #include <iostream>
-
+using namespace std;
 extern Simulation *backUp;
 
 ActionStatus BaseAction ::getStatus() const
@@ -122,49 +121,71 @@ AddFacility *AddFacility ::clone() const
 }
 const string AddFacility ::toString() const {}
 
-    PrintPlanStatus :: PrintPlanStatus(int planId): _planId(planId){}
-    void PrintPlanStatus :: act(Simulation &simulation){
-        Plan &p = simulation.getPlan(_planId); //create a new reference to the plan that getPlan returns,more efficient no need to copy the whole object
-        cout <<"Plan ID: " + to_string(_planId) + "     Settlement name:" + p.getSettlement().getName() << endl;
-        cout <<"Plan Status: ";
-        p.printStatus();
-        cout << endl;
-        cout << p.getSelectionPolicy().toString();
-        cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
-        //didnt finish yettt
+PrintPlanStatus ::PrintPlanStatus(int planId) : _planId(planId) {}
+void PrintPlanStatus ::act(Simulation &simulation)
+{
+    Plan &p = simulation.getPlan(_planId); // create a new reference to the plan that getPlan returns,more efficient no need to copy the whole object
+    cout << "Plan ID: " + to_string(_planId) + "     Settlement name:" + p.getSettlement().getName() << endl;
+    cout << "Plan Status: ";
+    p.printStatus();
+    cout << endl;
+    cout << p.getSelectionPolicy().toString();
+    cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
+    // didnt finish yettt
+}
+PrintPlanStatus *PrintPlanStatus ::clone() const {}
+const string PrintPlanStatus ::toString() const {}
+
+class ChangePlanPolicy : public BaseAction {
+    public:
+        ChangePlanPolicy(const int planId, const string &newPolicy);
+        void act(Simulation &simulation) override;
+        ChangePlanPolicy *clone() const override;
+        const string toString() const override;
+    private:
+        const int planId;
+        const string newPolicy;
+};
+
+PrintActionsLog::PrintActionsLog()
+{
+}
+void PrintActionsLog::act(Simulation &simulation)
+{
+    for(BaseAction* s :simulation.getActionsLog())
+    {
+        cout<<s->toString();
     }
-    PrintPlanStatus* PrintPlanStatus :: clone() const{}
-    const string PrintPlanStatus :: toString() const{}
+    complete();
+}
+PrintActionsLog *PrintActionsLog::clone() const
+{
+    return new PrintActionsLog(*this);
+}
+const string PrintActionsLog::toString() const
+{
+    return "actions log printed";
+}
 
-
-// class ChangePlanPolicy : public BaseAction {
-//     public:
-//         ChangePlanPolicy(const int planId, const string &newPolicy);
-//         void act(Simulation &simulation) override;
-//         ChangePlanPolicy *clone() const override;
-//         const string toString() const override;
-//     private:
-//         const int planId;
-//         const string newPolicy;
-// };
-
-// class PrintActionsLog : public BaseAction {
-//     public:
-//         PrintActionsLog();
-//         void act(Simulation &simulation) override;
-//         PrintActionsLog *clone() const override;
-//         const string toString() const override;
-//     private:
-// };
-
-// class Close : public BaseAction {
-//     public:
-//         Close();
-//         void act(Simulation &simulation) override;
-//         Close *clone() const override;
-//         const string toString() const override;
-//     private:
-// };
+Close::Close() {}
+void Close::act(Simulation &simulation)
+{
+    for (Plan &plan : simulation.getPlansVec())
+    {
+        {
+            cout << plan.toString();
+        }
+        simulation.close();
+    }
+}
+Close* Close::clone() const
+{
+    return new Close(*this);
+}
+const string Close::toString() const
+{
+    return "closed";
+}
 
 BackupSimulation::BackupSimulation() {}
 void BackupSimulation::act(Simulation &simulation)
