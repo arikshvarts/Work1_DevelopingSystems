@@ -165,17 +165,6 @@ const string AddFacility ::toString() const {}
     }
 
 
-class ChangePlanPolicy : public BaseAction {
-    public:
-        ChangePlanPolicy(const int planId, const string &newPolicy);
-        void act(Simulation &simulation) override;
-        ChangePlanPolicy *clone() const override;
-        const string toString() const override;
-    private:
-        const int planId;
-        const string newPolicy;
-};
-
 PrintActionsLog::PrintActionsLog()
 {
 }
@@ -250,7 +239,17 @@ void RestoreSimulation::act(Simulation &simulation)
     delete backUp;
     complete();
 }
-RestoreSimulation *RestoreSimulation::clone() const
+
+ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy):planId(planId),newPolicy(newPolicy)
+{}
+void ChangePlanPolicy::act(Simulation &simulation) 
+{}
+ChangePlanPolicy* ChangePlanPolicy::clone() const 
+{}
+const string ChangePlanPolicy::toString() const 
+{}
+
+RestoreSimulation* RestoreSimulation::clone() const
 {
     return new RestoreSimulation(*this);
 }

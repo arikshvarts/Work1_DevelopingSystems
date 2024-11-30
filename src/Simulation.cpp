@@ -244,7 +244,7 @@ void Simulation::start()
         }
         else if (args[0] == "changePolicy")
         {
-            ChangePlanPolicy action = ChangePlanPolicy();
+            ChangePlanPolicy action = ChangePlanPolicy(stoi(args[1]),args[2]);
             action.act(*this);
             addAction(&action);
         }
@@ -372,7 +372,7 @@ vector<BaseAction *>  Simulation::getActionsLog() const
 }
 const bool Simulation:: IsPlanExist(const int planID) const{
     bool to_ret = false;
-    for (auto &pl : plans)
+    for (Plan pl : plans)
     {
         if (pl.getPlanId() == planID)
         {
@@ -385,7 +385,7 @@ const bool Simulation:: IsPlanExist(const int planID) const{
 const bool Simulation:: IsFacilityExist(const string fac_Name) const{
     bool to_ret = false;
     for(FacilityType fac : facilitiesOptions){
-        if(fac.getName == fac_Name){return true;}
+        if(fac.getName() == fac_Name){return true;}
     }
     return to_ret;
 }       
