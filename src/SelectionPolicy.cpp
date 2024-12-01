@@ -59,7 +59,7 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
 
 const string SustainabilitySelection::toString() const
 {
-cout<<"i am a sustainability selection";
+cout<<"Sus";
 }
 
 SustainabilitySelection *SustainabilitySelection::clone() const
@@ -78,7 +78,7 @@ const FacilityType &NaiveSelection::selectFacility(const vector<FacilityType> &f
 
 const string NaiveSelection::toString() const
 {
-cout<<"i am a naive selection";
+cout<<"nve";
 }
 
 
@@ -103,7 +103,7 @@ const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> 
 }
 const string EconomySelection::toString() const
 {
-cout<<"i am a economy selection";
+cout<<"eco";
 }
 EconomySelection *EconomySelection::clone() const
 {

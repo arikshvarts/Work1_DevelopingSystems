@@ -4,9 +4,11 @@
 #include "../include/SelectionPolicy.h"
 #include <iostream>
 using namespace std;
-extern Simulation *backUp;
 
-// BaseAction :: BaseAction(){}
+Simulation *backUp=nullptr;
+
+BaseAction::BaseAction() : status(ActionStatus::ERROR), _errorMsg(" ") {}
+
 ActionStatus BaseAction ::getStatus() const
 {
     return status; // returns 0/1 and not COMPLETED/ERROR
@@ -26,7 +28,7 @@ const string &BaseAction ::getErrorMsg() const
     return _errorMsg;
 }
 
-SimulateStep ::SimulateStep(const int numOfSteps) : _numOfSteps(numOfSteps) {}
+SimulateStep ::SimulateStep(const int numOfSteps) : BaseAction(), _numOfSteps(numOfSteps) {}
 void SimulateStep ::act(Simulation &simulation)
 {
     for (Plan p : simulation.getPlansVec())
@@ -44,7 +46,7 @@ SimulateStep *SimulateStep ::clone() const
     // this method return a pointer to a new SimulateStep object with the same details
 }
 
-AddPlan ::AddPlan(const string &settlementName, const string &selectionPolicy) : _settlementName(settlementName), _selectionPolicy(selectionPolicy) {}
+AddPlan ::AddPlan(const string &settlementName, const string &selectionPolicy) :BaseAction(), _settlementName(settlementName), _selectionPolicy(selectionPolicy) {}
 void AddPlan ::act(Simulation &simulation)
 {
     if (simulation.isSettlementExists(_settlementName) == true)
@@ -91,7 +93,7 @@ AddPlan *AddPlan ::clone() const
     // this method return a pointer to a new Addplan object with the same details
 }
 
-AddSettlement ::AddSettlement(const string &settlementName, SettlementType settlementType) : _settlementName(settlementName), _settlementType(settlementType) {}
+AddSettlement ::AddSettlement(const string &settlementName, SettlementType settlementType) : BaseAction(),_settlementName(settlementName), _settlementType(settlementType) {}
 void AddSettlement ::act(Simulation &simulation)
 {
     if(simulation.isSettlementExists(_settlementName) == false){
@@ -116,7 +118,7 @@ const string AddSettlement ::toString() const
 }
 
 AddFacility ::AddFacility(const string &facilityName, const FacilityCategory facilityCategory, const int price, const int lifeQualityScore, const int economyScore, const int environmentScore)
-    : _facilityName(facilityName), _facilityCategory(facilityCategory), _price(price), _lifeQualityScore(lifeQualityScore), _economyScore(economyScore), _environmentScore(environmentScore) {}
+    :BaseAction(), _facilityName(facilityName), _facilityCategory(facilityCategory), _price(price), _lifeQualityScore(lifeQualityScore), _economyScore(economyScore), _environmentScore(environmentScore) {}
 void AddFacility ::act(Simulation &simulation)
 {
     if(simulation.IsFacilityExist(_facilityName) == false){
@@ -137,7 +139,7 @@ AddFacility *AddFacility ::clone() const
 }
 const string AddFacility ::toString() const {}
 
-    PrintPlanStatus :: PrintPlanStatus(int planId): _planId(planId){}
+    PrintPlanStatus :: PrintPlanStatus(int planId):BaseAction(), _planId(planId){}
     void PrintPlanStatus :: act(Simulation &simulation){
         if(simulation.IsPlanExist(_planId) == true){
             Plan &p = simulation.getPlan(_planId); //create a new reference to the plan that getPlan returns,more efficient no need to copy the whole object
@@ -187,16 +189,50 @@ const string PrintActionsLog::toString() const
     return "actions log printed";
 }
 
-ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy):planId(planId),newPolicy(newPolicy)
-{}
-void ChangePlanPolicy::act(Simulation &simulation) 
-{}
-ChangePlanPolicy* ChangePlanPolicy::clone() const 
-{}
-const string ChangePlanPolicy::toString() const 
-{}
+ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy):BaseAction(),planId(planId),newPolicy(newPolicy)
+{
 
-Close::Close() {}
+}
+void ChangePlanPolicy::act(Simulation &simulation) 
+{
+    if(simulation.IsPlanExist(planId)&&simulation.getPlan(planId).getSelectionPolicy().toString()!=newPolicy)//improve this because not work for balanced
+    {
+        cout<<this->toString();
+        SelectionPolicy *policy; 
+        if (newPolicy == "nve")
+        {
+            policy = new NaiveSelection();
+        }
+        else if(newPolicy == "bal")
+         {policy = new BalancedSelection(simulation.getPlan(planId).getlifeQualityScore(),simulation.getPlan(planId).getEconomyScore(),simulation.getPlan(planId).getEnvironmentScore());}
+        else if (newPolicy == "eco")
+        {
+            policy = new EconomySelection();
+        }
+        else if (newPolicy == "env")
+        {
+            policy = new SustainabilitySelection();
+        }
+        simulation.getPlan(planId).setSelectionPolicy(policy);
+    }
+    else
+    {
+            error("Cannot change selection policy");
+            cout << "ERROR: " + getErrorMsg();
+            return; // breaks the function, doesnt continue
+    }
+}
+ChangePlanPolicy* ChangePlanPolicy::clone() const 
+{
+    return new ChangePlanPolicy(*this);
+
+}
+const string ChangePlanPolicy::toString() const 
+{
+    return "pland ID:"+to_string(planId)+"previousPolicy:"+"new policy"+newPolicy;
+}
+
+Close::Close():BaseAction() {}
 void Close::act(Simulation &simulation)
 {
     for (Plan &plan : simulation.getPlansVec())
@@ -216,7 +252,7 @@ const string Close::toString() const
     return "closed";
 }
 
-BackupSimulation::BackupSimulation() {}
+BackupSimulation::BackupSimulation():BaseAction() {}
 void BackupSimulation::act(Simulation &simulation)
 {
     if (backUp)
@@ -235,19 +271,19 @@ const string BackupSimulation::toString() const
     return "simulation backed up Sucsesfully";
 }
 
-RestoreSimulation::RestoreSimulation()
+RestoreSimulation::RestoreSimulation():BaseAction()
 {
-    if (backUp == nullptr)
-    {
-        error("no backup available");
-        cout << "ERROR: " + getErrorMsg();
-        return; // breaks the function, doesnt continue
-    }
 }
 void RestoreSimulation::act(Simulation &simulation)
 {
+    if (backUp == nullptr) {
+        error("No backup available");
+        cout << "ERROR: " + getErrorMsg();
+        return;
+    }
     simulation = *backUp;
     delete backUp;
+    backUp = nullptr;
     complete();
 }
 
