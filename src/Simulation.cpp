@@ -20,7 +20,7 @@ Simulation::Simulation(const string &configFilePath) : planCounter(0),
         cerr << "Error: Could not open the file " << configFilePath << std::endl;
     }
 
-    std::string line;
+    string line;
     while (getline(inputFile, line))
     {
         // Skip empty lines
@@ -35,7 +35,7 @@ Simulation::Simulation(const string &configFilePath) : planCounter(0),
         }
         else if (arguments[0] == "facility")
         {
-            addFacility(Facility(arguments[1], arguments[2], static_cast<FacilityCategory>(stoi(arguments[3])), stoi(arguments[4]), stoi(arguments[5]), stoi(arguments[6]), stoi(arguments[7])));
+            addFacility(FacilityType(arguments[1],static_cast<FacilityCategory>(stoi(arguments[2])), stoi(arguments[3]), stoi(arguments[4]), stoi(arguments[5]), stoi(arguments[6])));
         }
         else if (arguments[0] == "plan")
         {
@@ -62,7 +62,7 @@ Simulation::Simulation(const string &configFilePath) : planCounter(0),
                         }
                         else
                         {
-                            throw std::invalid_argument("Invalid policy type: " + arguments[2]);
+                            throw invalid_argument("Invalid policy type: " + arguments[2]);
                         }
                     }
                 }
@@ -335,38 +335,38 @@ vector<Plan> &Simulation::getPlansVec()
 
 void Simulation::printInitialState() const
 {
-    std::cout << "Simulation Initial State:" << std::endl;
-    std::cout << "isRunning: " << (isRunning ? "true" : "false") << std::endl;
-    std::cout << "planCounter: " << planCounter << std::endl;
+    cout << "Simulation Initial State:" << endl;
+    cout << "isRunning: " << (isRunning ? "true" : "false") << endl;
+    cout << "planCounter: " << planCounter << endl;
 
-    std::cout << "Settlements:" << std::endl;
+    cout << "Settlements:" << endl;
     if (settlements.empty())
     {
-        std::cout << "  None" << std::endl;
+        cout << "  None" << endl;
     }
     else
     {
         for (const auto &settlement : settlements)
         {
-            std::cout << settlement->toString() << std::endl;
+            cout << settlement->toString() << endl;
         }
     }
 
-    std::cout << "Facilities Options:" << std::endl;
+    cout << "Facilities Options:" << endl;
     if (facilitiesOptions.empty())
     {
-        std::cout << "  None" << std::endl;
+        cout << "  None" << endl;
     }
     else
     {
         for (const auto &facility : facilitiesOptions)
         {
-            std::cout << "  Name: " << facility.getName()
+            cout << "  Name: " << facility.getName()
                       << " , Category: " << int(facility.getCategory()) << "\n"
                       << ", Price: " << facility.getCost()
                       << ", Life Quality Score: " << facility.getLifeQualityScore()
                       << ", Economy Score: " << facility.getEconomyScore()
-                      << ", Environment Score: " << facility.getEnvironmentScore() << std::endl;
+                      << ", Environment Score: " << facility.getEnvironmentScore() << endl;
         }
     }
 }
