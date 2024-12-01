@@ -83,6 +83,9 @@ Simulation::Simulation(const Simulation &sim) : isRunning(sim.isRunning), planCo
     {
         settlements.push_back(new Settlement(*ptr));
     }
+    for (const FacilityType& facility : sim.facilitiesOptions) {
+    facilitiesOptions.push_back(facility); // Uses copy constructor
+    }
 }
 Simulation &Simulation::operator=(const Simulation &sim)
 {
@@ -118,11 +121,16 @@ Simulation &Simulation::operator=(const Simulation &sim)
         plans.clear();
 
         // Copy each Plan from the other Simulation
-        for (const auto &plan : sim.plans)
+        for (const Plan &plan : sim.plans)
         {
             plans.push_back(plan);
         }
-        facilitiesOptions = sim.facilitiesOptions;
+        // facilitiesOptions = sim.facilitiesOptions;
+        for (const FacilityType &facility : sim.facilitiesOptions)
+        {
+            facilitiesOptions.push_back(facility); // Uses copy constructor to add the facility
+        }
+
     }
 }
 Simulation::Simulation(Simulation &&sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), plans(sim.plans), facilitiesOptions(sim.facilitiesOptions), settlements(sim.settlements), actionsLog(sim.actionsLog)

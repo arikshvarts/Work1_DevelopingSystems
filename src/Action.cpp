@@ -6,6 +6,7 @@
 using namespace std;
 extern Simulation *backUp;
 
+// BaseAction :: BaseAction(){}
 ActionStatus BaseAction ::getStatus() const
 {
     return status; // returns 0/1 and not COMPLETED/ERROR
@@ -186,6 +187,15 @@ const string PrintActionsLog::toString() const
     return "actions log printed";
 }
 
+ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy):planId(planId),newPolicy(newPolicy)
+{}
+void ChangePlanPolicy::act(Simulation &simulation) 
+{}
+ChangePlanPolicy* ChangePlanPolicy::clone() const 
+{}
+const string ChangePlanPolicy::toString() const 
+{}
+
 Close::Close() {}
 void Close::act(Simulation &simulation)
 {
@@ -241,14 +251,7 @@ void RestoreSimulation::act(Simulation &simulation)
     complete();
 }
 
-ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy):planId(planId),newPolicy(newPolicy)
-{}
-void ChangePlanPolicy::act(Simulation &simulation) 
-{}
-ChangePlanPolicy* ChangePlanPolicy::clone() const 
-{}
-const string ChangePlanPolicy::toString() const 
-{}
+
 
 RestoreSimulation* RestoreSimulation::clone() const
 {
