@@ -110,13 +110,9 @@ void Plan::step()
 }
 void Plan::printStatus()
 {
-    switch (status)
-    {
-    case PlanStatus::AVALIABLE:
-        cout << "AVALIABLE";
-    case PlanStatus::BUSY:
-        cout << "BUSY";
-    }
+    if(int(status) == 0) {cout << "AVALIABLE";}
+    if(int(status) == 1) {cout <<"Busy";}
+
 }
 vector<Facility *> &Plan::getFacilities() // returned by refernce to ebable modification
 {
