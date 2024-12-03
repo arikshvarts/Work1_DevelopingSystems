@@ -248,6 +248,8 @@ void Simulation::start()
             action->act(*this);
             addAction(action);
         }
+        else
+            break;
     }
 }
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy)

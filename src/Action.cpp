@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-Simulation *backUp = nullptr;
+extern Simulation *backup;
 
 BaseAction::BaseAction() : status(ActionStatus::ERROR), _errorMsg(" ") {}
 
@@ -30,9 +30,9 @@ const string &BaseAction ::getErrorMsg() const
 SimulateStep ::SimulateStep(const int numOfSteps) : BaseAction(), _numOfSteps(numOfSteps) {}
 void SimulateStep ::act(Simulation &simulation)
 {
-    for (Plan p : simulation.getPlansVec())
+    for (int i=0; i<_numOfSteps; i+=1)
     {
-        p.step();
+        simulation.step();
     }
 }
 const string SimulateStep ::toString() const
@@ -142,23 +142,13 @@ AddFacility *AddFacility ::clone() const
 }
 const string AddFacility ::toString() const {}
 
-PrintPlanStatus ::PrintPlanStatus(int planId) : _planId(planId) {}
+PrintPlanStatus ::PrintPlanStatus(int planId) :BaseAction(), _planId(planId) {}
 void PrintPlanStatus ::act(Simulation &simulation)
 {
     if (simulation.IsPlanExist(_planId) == true)
     {
-        Plan &p = simulation.getPlan(_planId); 
-        cout << "Plan ID: " + to_string(_planId) + "Settlement name:" + p.getSettlement().getName() << endl;
-        cout << "Plan Status: ";
-        // p.printStatus();
-        cout << endl;
-        cout << p.getSelectionPolicy();
-        cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
-        vector<Facility *> &facilities = p.getFacilities();
-        for (Facility *fac : simulation.getPlan(0).getFacilities())
-        {
-            cout << fac->toString() << endl;
-        }
+        cout<<simulation.getPlan(_planId).toString(); 
+
     }
     else
     {
@@ -166,6 +156,7 @@ void PrintPlanStatus ::act(Simulation &simulation)
         cout << "ERROR: " + getErrorMsg();
         return; // breaks the function, doesnt continue
     }
+    complete();
 }
 PrintPlanStatus *PrintPlanStatus ::clone() const
 {
@@ -174,7 +165,8 @@ PrintPlanStatus *PrintPlanStatus ::clone() const
 }
 const string PrintPlanStatus ::toString() const
 {
-    cout << "Printed Plan Status";
+    string statusAct;
+    return  "Printed Plan Status"+to_string(_planId);
 }
 
 PrintActionsLog::PrintActionsLog()
@@ -271,11 +263,11 @@ const string Close::toString() const
 BackupSimulation::BackupSimulation() : BaseAction() {}
 void BackupSimulation::act(Simulation &simulation)
 {
-    if (backUp)
+    if (backup)
     {
-        delete backUp;
+        delete backup;
     }
-    backUp = new Simulation(simulation);
+    backup = new Simulation(simulation);
     complete();
 }
 BackupSimulation *BackupSimulation::clone() const
@@ -284,7 +276,7 @@ BackupSimulation *BackupSimulation::clone() const
 }
 const string BackupSimulation::toString() const
 {
-    return "simulation backed up Sucsesfully";
+    return "backup COMPLETED";
 }
 
 RestoreSimulation::RestoreSimulation() : BaseAction()
@@ -292,15 +284,15 @@ RestoreSimulation::RestoreSimulation() : BaseAction()
 }
 void RestoreSimulation::act(Simulation &simulation)
 {
-    if (backUp == nullptr)
+    if (backup == nullptr)
     {
         error("No backup available");
         cout << "ERROR: " + getErrorMsg();
         return;
     }
-    simulation = *backUp;
-    delete backUp;
-    backUp = nullptr;
+    simulation = *backup;
+    // delete backup;
+    // backup = nullptr;
     complete();
 }
 

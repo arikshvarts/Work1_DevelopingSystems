@@ -105,8 +105,7 @@ EconomySelection::EconomySelection():lastSelectedIndex(-1)
 
 const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> &facilitiesOptions)
 {
-    for (size_t i = lastSelectedIndex; i < facilitiesOptions.size(); ++i) {
-    
+    for (int i = lastSelectedIndex; i < static_cast<int>(facilitiesOptions.size()); i++) {
         lastSelectedIndex=(lastSelectedIndex+1)%(facilitiesOptions.size());
         if (facilitiesOptions[lastSelectedIndex].getCategory()==FacilityCategory::ECONOMY)
         {
