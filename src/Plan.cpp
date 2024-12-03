@@ -1,5 +1,4 @@
 #include "../include/Plan.h"
-#include "../include/Facility.h"
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -9,13 +8,32 @@ Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *sele
       underConstruction(vector<Facility *>()), life_quality_score(0), economy_score(0), environment_score(0), status(PlanStatus::AVALIABLE)
 {}
 
-Plan::Plan(const Plan &other):settlement(other.settlement),plan_id(other.plan_id),facilities(deepCopyFacilities(other.facilities)),underConstruction(deepCopyFacilities(other.underConstruction)),
-facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score), status(other.status),selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr)
-{
+Plan::Plan(const Plan &other)
+: plan_id(other.plan_id),
+settlement(other.settlement),
+selectionPolicy(),
+status(other.status),
+facilities(),
+underConstruction(),
+facilityOptions(other.facilityOptions),
+life_quality_score(other.life_quality_score),
+economy_score(other.economy_score),
+environment_score(other.environment_score) 
+{   
+    if (other.selectionPolicy != nullptr)
+        selectionPolicy = other.selectionPolicy->clone();
+    else
+        selectionPolicy = nullptr;
+    
+    for (Facility* curr: other.facilities)
+        facilities.push_back(curr->clone());
+    
+    for (Facility* curr: other.underConstruction)
+        underConstruction.push_back(curr->clone());
 }
 
-Plan::Plan(Plan &&other):settlement(other.settlement),plan_id(other.plan_id),facilities(deepCopyFacilities(other.facilities)),underConstruction(deepCopyFacilities(other.underConstruction)),
-facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score), status(other.status),selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr)
+Plan::Plan(Plan &&other):settlement(other.settlement),plan_id(other.plan_id),facilities(other.facilities),underConstruction(other.underConstruction),
+facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score), status(other.status),selectionPolicy(other.selectionPolicy)
 {
 other.selectionPolicy=nullptr;
 other.facilities.clear();
@@ -33,8 +51,8 @@ Plan::~Plan()
     {
         delete instance;//deletes the object pointed to by the pointer
     }
-    facilities.clear();// Removes all pointers from the vector
-    underConstruction.clear();// Removes all pointers from the vector
+    // facilities.clear();// Removes all pointers from the vector
+    // underConstruction.clear();// Removes all pointers from the vector
 }
 
 const int Plan::getlifeQualityScore() const
@@ -68,6 +86,7 @@ const int Plan::getEnvironmentScore() const
 void Plan::setSelectionPolicy(SelectionPolicy *selectionPolicy)
 {
     this->selectionPolicy = selectionPolicy;
+    // delete selectionPolicy;
 }
 void Plan::step()
 {
@@ -138,6 +157,8 @@ const Settlement& Plan :: getSettlement() const{
     return settlement;
 }
 
-const SelectionPolicy& Plan :: getSelectionPolicy() const{
-    return *selectionPolicy;
+string Plan :: getSelectionPolicy() const{
+    return selectionPolicy->toStringSimple() ;
 }
+
+

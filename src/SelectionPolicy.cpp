@@ -36,6 +36,12 @@ const string BalancedSelection::toString() const
     return oss.str();    
 }
 
+ string BalancedSelection::toStringSimple() const
+{
+    return "bal";
+}
+
+
 BalancedSelection * BalancedSelection::clone() const
 {
     return new BalancedSelection(*this); // Use copy constructor to create a deep copy
@@ -59,14 +65,17 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
 
 const string SustainabilitySelection::toString() const
 {
-cout<<"Sus";
+cout<<"sus";
 }
 
 SustainabilitySelection *SustainabilitySelection::clone() const
 {
     return new SustainabilitySelection(*this); // Use copy constructor to create a deep copy
 }
-
+ string SustainabilitySelection::toStringSimple() const
+{
+    return "env";
+}
 NaiveSelection::NaiveSelection():lastSelectedIndex(-1)
 {}
 
@@ -85,6 +94,10 @@ cout<<"nve";
 NaiveSelection * NaiveSelection::clone() const
 {
     return new NaiveSelection(*this); // Use copy constructor to create a deep copy
+}
+ string NaiveSelection::toStringSimple() const
+{
+    return "nve";
 }
 
 EconomySelection::EconomySelection():lastSelectedIndex(-1)
@@ -108,4 +121,8 @@ cout<<"eco";
 EconomySelection *EconomySelection::clone() const
 {
     return new EconomySelection(*this); // Use copy constructor to create a deep copy
+}
+ string EconomySelection::toStringSimple() const
+{
+    return "eco";
 }

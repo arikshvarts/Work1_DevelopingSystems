@@ -12,3 +12,7 @@
         string types[3] = {"Village","City", "Metropolin"};
         return "Name: " + getName() + "     Type: " + types[int(type)];
     }   
+Settlement *Settlement::clone() const
+{
+    return new Settlement(*this);
+}

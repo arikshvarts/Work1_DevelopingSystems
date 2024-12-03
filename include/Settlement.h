@@ -16,6 +16,7 @@ class Settlement {
         const string &getName() const;
         SettlementType getType() const;
         const string toString() const;
+        Settlement* clone() const;
 
         private:
             const string name;

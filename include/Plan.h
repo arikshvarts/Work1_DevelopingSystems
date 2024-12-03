@@ -30,7 +30,7 @@ class Plan {
         const string toString() const;
         vector<Facility*> deepCopyFacilities(const vector<Facility*>& facilities);
         const Settlement &getSettlement() const;
-        const SelectionPolicy &getSelectionPolicy() const;
+        string getSelectionPolicy() const;
 
 
 
