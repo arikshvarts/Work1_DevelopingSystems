@@ -9,7 +9,6 @@ enum class FacilityCategory;
 enum class ActionStatus{
     COMPLETED, ERROR
 };
-extern Simulation *backUp;
 
 class BaseAction{
     public:

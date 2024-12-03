@@ -10,16 +10,6 @@ FacilityType::FacilityType(const string &name, const FacilityCategory category, 
     : name(name), category(category), price(price), lifeQuality_score(lifeQuality_score), economy_score(economy_score), environment_score(environment_score)
 {
 }
-
-FacilityType::FacilityType(const FacilityType &other)
-    : name(other.name), category(other.category), price(other.price), lifeQuality_score(other.lifeQuality_score), economy_score(other.economy_score), environment_score(other.environment_score)
-{
-}
-// FacilityType& operator=(const FacilityType& other)
-// {
-
-// }
-
 const string &FacilityType::getName() const
 {
     return name;
