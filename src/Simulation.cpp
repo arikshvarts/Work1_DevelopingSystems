@@ -9,8 +9,8 @@
 #include <fstream>
 using namespace std;
 
-Simulation::Simulation(const string &configFilePath) : planCounter(0),
-                                                       isRunning(false), actionsLog(), plans(), settlements(), facilitiesOptions()
+Simulation::Simulation(const string &configFilePath) : isRunning(false), planCounter(0),
+ actionsLog(), plans(), settlements(), facilitiesOptions()
 {
     std::ifstream inputFile(configFilePath);
 
@@ -63,7 +63,7 @@ Simulation::Simulation(const string &configFilePath) : planCounter(0),
     }
     inputFile.close(); // Close the file after processing
 }
-Simulation::Simulation(const Simulation &sim) : settlements(), actionsLog(), isRunning(sim.isRunning), planCounter(sim.planCounter), plans(plans), facilitiesOptions(facilitiesOptions)
+Simulation::Simulation(const Simulation &sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), actionsLog(), plans(sim.plans), settlements(), facilitiesOptions(sim.facilitiesOptions)
 {
     for (BaseAction* ptr : sim.actionsLog)
     {
@@ -121,8 +121,9 @@ Simulation &Simulation::operator=(const Simulation &sim)
 
         return *this;
     }
+    return *this; // Ensures a return statement exists if this == &sim
 }
-Simulation::Simulation(Simulation &&sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), plans(sim.plans), facilitiesOptions(sim.facilitiesOptions), settlements(sim.settlements), actionsLog(sim.actionsLog)
+Simulation::Simulation(Simulation &&sim) : isRunning(sim.isRunning), planCounter(sim.planCounter),  actionsLog(sim.actionsLog), plans(sim.plans), settlements(sim.settlements), facilitiesOptions(sim.facilitiesOptions)
 {
     sim.actionsLog.clear();
     sim.settlements.clear();
@@ -181,7 +182,7 @@ Simulation::~Simulation()
 }
 void Simulation::start()
 {
-    cout << "Simulation has started";
+    cout << "Simulation has started: " << endl;
     open();
     while (isRunning)
     {
@@ -267,11 +268,14 @@ bool Simulation::addSettlement(Settlement *settlement)
     if (!isSettlementExists(settlement->getName()))
     {
         settlements.push_back(settlement);
+        return true;
     }
+    return false;
 }
 bool Simulation::addFacility(FacilityType facility)
 {
     facilitiesOptions.push_back(facility);
+    return true;
 }
 bool Simulation::isSettlementExists(const string &settlementName)
 {
@@ -294,12 +298,14 @@ Settlement &Simulation::getSettlement(const string &settlementName)
             return *sett; // Found the Sett with the matching name
         }
     }
+    throw runtime_error("settlemnt dowsn't exist");
+
 }
 
 Plan &Simulation::getPlan(const int planID)
 {
     if (planID >= this->planCounter)
-        throw runtime_error("plan nonExistant");
+        throw runtime_error("plan doesn't exist");
     return plans[planID];
 }
 void Simulation::step()

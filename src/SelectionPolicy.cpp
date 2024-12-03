@@ -10,17 +10,18 @@ LifeQualityScore(LifeQualityScore),EconomyScore(EconomyScore),EnvironmentScore(E
 
 const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType> &facilitiesOptions)
 {
+
     int counter=0;
     int max_Facility_index=-999;
-    int currBiggest=0;
+    int currSmallest = std::numeric_limits<int>::max();
     for (FacilityType instance : facilitiesOptions)
     {
-        double ec=EconomyScore+instance.getEconomyScore();
-        double env=EnvironmentScore+instance.getEnvironmentScore();
-        double lifeQual=LifeQualityScore+instance.getLifeQualityScore();
-        if(max({ec,env,lifeQual})-min({ec,env,lifeQual})<currBiggest)
+        int ec=EconomyScore+instance.getEconomyScore();
+        int env=EnvironmentScore+instance.getEnvironmentScore();
+        int lifeQual=LifeQualityScore+instance.getLifeQualityScore();
+        if(max({ec,env,lifeQual})-min({ec,env,lifeQual})<currSmallest)
         {
-        currBiggest=max({ec,env,lifeQual})-min({ec,env,lifeQual});
+        currSmallest=max({ec,env,lifeQual})-min({ec,env,lifeQual});
         max_Facility_index=counter;
         }
         counter++;
@@ -60,12 +61,13 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
         return facilitiesOptions[lastSelectedIndex];
         }
 }
+throw std::runtime_error("no facility from category Enviroment");
 
 }
 
 const string SustainabilitySelection::toString() const
 {
-cout<<"sus";
+    return "sus";
 }
 
 SustainabilitySelection *SustainabilitySelection::clone() const
@@ -87,7 +89,7 @@ const FacilityType &NaiveSelection::selectFacility(const vector<FacilityType> &f
 
 const string NaiveSelection::toString() const
 {
-cout<<"nve";
+return "nve";
 }
 
 
@@ -111,11 +113,12 @@ const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> 
         {
         return facilitiesOptions[lastSelectedIndex];
         }
-}
+    }
+    throw std::runtime_error("no facility from category Economy");
 }
 const string EconomySelection::toString() const
 {
-cout<<"eco";
+return "eco";
 }
 EconomySelection *EconomySelection::clone() const
 {

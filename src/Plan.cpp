@@ -6,8 +6,8 @@
 #include <sstream>
 
 Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions)
-    : plan_id(planId), facilityOptions(facilityOptions), selectionPolicy(selectionPolicy), settlement(settlement), facilities(vector<Facility *>()),
-      underConstruction(vector<Facility *>()), life_quality_score(0), economy_score(0), environment_score(0), status(PlanStatus::AVALIABLE)
+    : plan_id(planId), settlement(settlement), selectionPolicy(selectionPolicy), status(PlanStatus::AVALIABLE),  facilities(vector<Facility *>()),
+      underConstruction(vector<Facility *>()),facilityOptions(facilityOptions), life_quality_score(0), economy_score(0), environment_score(0)
 {
 }
 
@@ -35,8 +35,8 @@ Plan::Plan(const Plan &other)
         underConstruction.push_back(curr->clone());
 }
 
-Plan::Plan(Plan &&other) : settlement(other.settlement), plan_id(other.plan_id), facilities(other.facilities), underConstruction(other.underConstruction),
-                           facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score), status(other.status), selectionPolicy(other.selectionPolicy)
+Plan::Plan(Plan &&other) : plan_id(other.plan_id), settlement(other.settlement), selectionPolicy(other.selectionPolicy), status(other.status), facilities(other.facilities), underConstruction(other.underConstruction),
+facilityOptions(other.facilityOptions), life_quality_score(other.life_quality_score), economy_score(other.economy_score), environment_score(other.environment_score)
 {
     other.selectionPolicy = nullptr;
     other.facilities.clear();
@@ -102,7 +102,7 @@ void Plan::step()
             addFacility(tempFacility);
         }
     }
-    for (int it = 0; it < underConstruction.size();)
+    for (std::size_t it = 0; it < underConstruction.size();) //using size_t instead of int to prevent comparing int to size (unsigned)
     {
         underConstruction[it]->step();
         if (underConstruction[it]->getTimeLeft() == 0)
@@ -122,7 +122,7 @@ void Plan::step()
             it += 1;
         }
     }
-    if (underConstruction.size() == int(settlement.getType()) + 1)
+    if (underConstruction.size() == size_t(settlement.getType()) + 1)
     {
         status = PlanStatus::BUSY;
     }

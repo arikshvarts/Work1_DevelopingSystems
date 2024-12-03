@@ -6,7 +6,7 @@ using namespace std;
 
 extern Simulation *backup;
 
-BaseAction::BaseAction() : status(ActionStatus::ERROR), _errorMsg(" ") {}
+BaseAction::BaseAction() : _errorMsg(" "), status(ActionStatus::ERROR) {}
 
 ActionStatus BaseAction ::getStatus() const
 {
@@ -140,7 +140,10 @@ AddFacility *AddFacility ::clone() const
     return new AddFacility(*this);
     // this method return a pointer to a new AddSettlement object with the same details
 }
-const string AddFacility ::toString() const {}
+const string AddFacility ::toString() const {
+        string statusAct;
+    return  "Facility added - " + _facilityName;
+}
 
 PrintPlanStatus ::PrintPlanStatus(int planId) :BaseAction(), _planId(planId) {}
 void PrintPlanStatus ::act(Simulation &simulation)
