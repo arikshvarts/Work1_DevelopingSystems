@@ -55,7 +55,7 @@ void AddPlan ::act(Simulation &simulation)
         {
             policy = new NaiveSelection();
         }
-        // else if(_selectionPolicy == "bal") {policy = new BalancedSelection(simulation.getPlan().getlifeQualityScore(),simulation.getPlan().getEconomyScore(),simulation.getPlan().getEnvironmentScore());}
+        else if(_selectionPolicy == "bal") {policy = new BalancedSelection(0,0,0);}
         // livdok how to enter tho 3scores to the  new BalancedSelection
         else if (_selectionPolicy == "eco")
         {
