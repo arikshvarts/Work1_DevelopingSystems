@@ -10,7 +10,7 @@
 using namespace std;
 
 Simulation::Simulation(const string &configFilePath) : planCounter(0),
-                                                       isRunning(false)
+                                                       isRunning(false), actionsLog(), plans(), settlements(), facilitiesOptions()
 {
     std::ifstream inputFile(configFilePath);
 
@@ -35,56 +35,43 @@ Simulation::Simulation(const string &configFilePath) : planCounter(0),
         }
         else if (arguments[0] == "facility")
         {
-            addFacility(FacilityType(arguments[1],static_cast<FacilityCategory>(stoi(arguments[2])), stoi(arguments[3]), stoi(arguments[4]), stoi(arguments[5]), stoi(arguments[6])));
+            addFacility(FacilityType(arguments[1], static_cast<FacilityCategory>(stoi(arguments[2])), stoi(arguments[3]), stoi(arguments[4]), stoi(arguments[5]), stoi(arguments[6])));
         }
         else if (arguments[0] == "plan")
         {
-            for (int i = 0; i < settlements.size(); ++i)
+                        SelectionPolicy* policy;
+            if (arguments[2] == "nve")
             {
-                {
-                    if ((*settlements[i]).getName() == arguments[1])
-                    {
-                        if (arguments[2] == "nve")
-                        {
-                            addPlan(*settlements[i], new NaiveSelection());
-                        }
-                        else if (arguments[2] == "bal")
-                        {
-                            addPlan(*settlements[i], new BalancedSelection(0, 0, 0));
-                        }
-                        else if (arguments[2] == "eco")
-                        {
-                            addPlan(*settlements[i], new EconomySelection());
-                        }
-                        else if (arguments[2] == "env")
-                        {
-                            addPlan(*settlements[i], new SustainabilitySelection());
-                        }
-                        else
-                        {
-                            throw invalid_argument("Invalid policy type: " + arguments[2]);
-                        }
-                    }
-                }
+               policy = new NaiveSelection();
             }
-        }
+            else if (arguments[2] == "bal")
+            {
+                policy = new BalancedSelection(0, 0, 0);
+            }
+            else if (arguments[2] == "eco")
+            {
+                policy = new EconomySelection();
+            }
+            else if (arguments[2] == "env")
+            {
+                policy = new SustainabilitySelection();
+            }   
+                
+            
+          addPlan(getSettlement(arguments[1]), policy);
+    }
     }
     inputFile.close(); // Close the file after processing
 }
-Simulation::Simulation(const Simulation &sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), plans(plans), facilitiesOptions(facilitiesOptions)
+Simulation::Simulation(const Simulation &sim) : settlements(), actionsLog(), isRunning(sim.isRunning), planCounter(sim.planCounter), plans(plans), facilitiesOptions(facilitiesOptions)
 {
-    for (auto ptr : sim.actionsLog)
+    for (BaseAction* ptr : sim.actionsLog)
     {
         actionsLog.push_back(ptr->clone()); // Allocate new object and copy data
     }
-
-    // Then, deep copy the second vector (vec2)
-    for (auto ptr : sim.settlements)
+    for (Settlement*  ptr : sim.settlements)
     {
-        settlements.push_back(new Settlement(*ptr));
-    }
-    for (const FacilityType& facility : sim.facilitiesOptions) {
-    facilitiesOptions.push_back(facility); // Uses copy constructor
+        settlements.push_back(ptr->clone());
     }
 }
 Simulation &Simulation::operator=(const Simulation &sim)
@@ -92,45 +79,47 @@ Simulation &Simulation::operator=(const Simulation &sim)
     if (this != &sim)
     {
         // Clean up current resources (actionsLog and settlements)
-        for (auto ptr : actionsLog)
+        for (BaseAction *ptr : actionsLog)
         {
             delete ptr;
         }
         actionsLog.clear();
 
-        for (auto ptr : settlements)
+        for (Settlement *ptr : settlements)
         {
             delete ptr;
         }
         settlements.clear();
 
         // Deep copy the actionsLog
-        for (auto ptr : sim.actionsLog)
+        for (BaseAction *ptr : sim.actionsLog)
         {
             actionsLog.push_back(ptr->clone()); // Assuming clone() makes a deep copy
         }
 
         // Deep copy the settlements
-        for (auto ptr : sim.settlements)
+        for (Settlement *ptr : sim.settlements)
         {
-            settlements.push_back(new Settlement(*ptr)); // Assuming 'new' creates a deep copy
+            settlements.push_back(ptr->clone()); // Assuming 'new' creates a deep copy
         }
 
         // Copy primitive members
         isRunning = sim.isRunning;
+        planCounter = sim.planCounter;
         plans.clear();
 
         // Copy each Plan from the other Simulation
-        for (const Plan &plan : sim.plans)
+        for (Plan plan : sim.plans)
         {
             plans.push_back(plan);
         }
-        // facilitiesOptions = sim.facilitiesOptions;
-        for (const FacilityType &facility : sim.facilitiesOptions)
+        facilitiesOptions.clear();
+        for (FacilityType facility : sim.facilitiesOptions)
         {
             facilitiesOptions.push_back(facility); // Uses copy constructor to add the facility
         }
 
+        return *this;
     }
 }
 Simulation::Simulation(Simulation &&sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), plans(sim.plans), facilitiesOptions(sim.facilitiesOptions), settlements(sim.settlements), actionsLog(sim.actionsLog)
@@ -141,51 +130,54 @@ Simulation::Simulation(Simulation &&sim) : isRunning(sim.isRunning), planCounter
 
 Simulation &Simulation::operator=(Simulation &&sim)
 {
+    // Check for self-assignment
     if (this != &sim)
     {
-        // Clean up current resources (actionsLog and settlements)
-        for (auto ptr : actionsLog)
+        for (BaseAction *ptr : actionsLog)
         {
             delete ptr;
         }
-        actionsLog.clear();
+        actionsLog = sim.actionsLog;
+        sim.actionsLog.clear(); // Clear the source object's actionsLog to avoid dangling references
 
-        for (auto ptr : settlements)
+        for (Settlement *ptr : settlements)
         {
             delete ptr;
+            
         }
-        settlements.clear();
+        settlements = sim.settlements;
+        sim.settlements.clear(); // Clear the current object's settlements
 
-        // Transfer ownership of resources from 'sim' to 'this'
-        actionsLog = move(sim.actionsLog);               // Move the vector of actions (no deep copy, just ownership transfer)
-        settlements = move(sim.settlements);             // Move the vector of settlements (ownership transfer)
-        plans = move(sim.plans);                         // Move the plans vector
-        facilitiesOptions = move(sim.facilitiesOptions); // Move the facilities options vector
-
-        // Transfer other data members
-        isRunning = sim.isRunning;
-        planCounter = sim.planCounter;
-
-        sim.actionsLog.clear();
-        sim.settlements.clear();
+        plans.clear();
+        for (Plan curr : sim.plans)
+        {
+            plans.push_back(curr);
+        }
         sim.plans.clear();
-        sim.facilitiesOptions.clear();
+
+        facilitiesOptions.clear(); // Clear existing facility options in the current object
+        for (FacilityType curr : sim.facilitiesOptions)
+        {
+            facilitiesOptions.push_back(curr);
+        }
+        sim.facilitiesOptions.clear(); // Clear the source object's facility options
     }
+
+    // Return a reference to the current object
+    return *this;
 }
 
 Simulation::~Simulation()
 {
-    for (auto ptr : actionsLog)
+    for (BaseAction *ptr : actionsLog)
     {
         delete ptr;
     }
-    actionsLog.clear();
 
-    for (auto ptr : settlements)
+    for (Settlement *ptr : settlements)
     {
         delete ptr;
     }
-    settlements.clear();
 }
 void Simulation::start()
 {
@@ -198,63 +190,63 @@ void Simulation::start()
         vector<string> args = Auxiliary::parseArguments(input);
         if (args[0] == "plan")
         {
-            AddPlan action = AddPlan(args[1], args[2]);
-            action.act(*this);
-            addAction(&action);
+            AddPlan *action = new AddPlan(args[1], args[2]);
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "planStatus")
         {
-            PrintPlanStatus action = PrintPlanStatus(stoi(args[1]));
-            action.act(*this);
-            addAction(&action);
+            PrintPlanStatus *action = new PrintPlanStatus(stoi(args[1]));
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "facility")
         {
-            AddFacility action = AddFacility(args[1], static_cast<FacilityCategory>(stoi(args[2])), stoi(args[3]), stoi(args[4]), stoi(args[5]), stoi(args[6]));
-            action.act(*this);
-            addAction(&action);
+            AddFacility *action = new AddFacility(args[1], static_cast<FacilityCategory>(stoi(args[2])), stoi(args[3]), stoi(args[4]), stoi(args[5]), stoi(args[6]));
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "backup")
         {
-            BackupSimulation action = BackupSimulation();
-            action.act(*this);
-            addAction(&action);
+            BackupSimulation *action = new BackupSimulation();
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "log")
         {
-            PrintActionsLog action = PrintActionsLog();
-            action.act(*this);
-            addAction(&action);
+            PrintActionsLog *action = new PrintActionsLog();
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "settlement")
         {
-            AddSettlement action = AddSettlement(args[1], static_cast<SettlementType>(stoi(args[2])));
-            action.act(*this);
-            addAction(&action);
+            AddSettlement *action = new AddSettlement(args[1], static_cast<SettlementType>(stoi(args[2])));
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "step")
         {
-            SimulateStep action = SimulateStep(stoi(args[1]));
-            action.act(*this);
-            addAction(&action);
+            SimulateStep *action = new SimulateStep(stoi(args[1]));
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "restore")
         {
-            RestoreSimulation action = RestoreSimulation();
-            action.act(*this);
-            addAction(&action);
+            RestoreSimulation *action = new RestoreSimulation();
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "close")
         {
-            Close action = Close();
-            action.act(*this);
-            addAction(&action);
+            Close *action = new Close();
+            action->act(*this);
+            addAction(action);
         }
         else if (args[0] == "changePolicy")
         {
-            ChangePlanPolicy action = ChangePlanPolicy(stoi(args[1]),args[2]);
-            action.act(*this);
-            addAction(&action);
+            ChangePlanPolicy *action = new ChangePlanPolicy(stoi(args[1]), args[2]);
+            action->act(*this);
+            addAction(action);
         }
     }
 }
@@ -304,17 +296,13 @@ Settlement &Simulation::getSettlement(const string &settlementName)
 
 Plan &Simulation::getPlan(const int planID)
 {
-    for (auto &pl : plans)
-    {
-        if (pl.getPlanId() == planID)
-        {
-            return pl; // Found the Sett with the matching name
-        }
-    }
+    if (planID >= this->planCounter)
+        throw runtime_error("plan nonExistant");
+    return plans[planID];
 }
 void Simulation::step()
 {
-    for (Plan pl : plans)
+    for (Plan &pl : plans)
     {
         pl.step();
     }
@@ -328,7 +316,7 @@ void Simulation::open()
     isRunning = true;
 }
 
-vector<Plan> &Simulation::getPlansVec() 
+vector<Plan> &Simulation::getPlansVec()
 {
     return plans;
 }
@@ -362,23 +350,24 @@ void Simulation::printInitialState() const
         for (const auto &facility : facilitiesOptions)
         {
             cout << "  Name: " << facility.getName()
-                      << " , Category: " << int(facility.getCategory()) << "\n"
-                      << ", Price: " << facility.getCost()
-                      << ", Life Quality Score: " << facility.getLifeQualityScore()
-                      << ", Economy Score: " << facility.getEconomyScore()
-                      << ", Environment Score: " << facility.getEnvironmentScore() << endl;
+                 << " , Category: " << int(facility.getCategory()) << "\n"
+                 << ", Price: " << facility.getCost()
+                 << ", Life Quality Score: " << facility.getLifeQualityScore()
+                 << ", Economy Score: " << facility.getEconomyScore()
+                 << ", Environment Score: " << facility.getEnvironmentScore() << endl;
         }
     }
 }
-Simulation *Simulation::clone() const
-{
-    return new Simulation(*this); // Use copy constructor to create a deep copy
-}
-vector<BaseAction *>  Simulation::getActionsLog() const
+// Simulation *Simulation::clone() const
+// {
+//     return new Simulation(*this); // Use copy constructor to create a deep copy
+// }
+vector<BaseAction *> Simulation::getActionsLog() const
 {
     return actionsLog;
 }
-const bool Simulation:: IsPlanExist(const int planID) const{
+const bool Simulation::IsPlanExist(const int planID) const
+{
     bool to_ret = false;
     for (Plan pl : plans)
     {
@@ -390,10 +379,15 @@ const bool Simulation:: IsPlanExist(const int planID) const{
     return to_ret;
 }
 
-const bool Simulation:: IsFacilityExist(const string fac_Name) const{
+const bool Simulation::IsFacilityExist(const string fac_Name) const
+{
     bool to_ret = false;
-    for(FacilityType fac : facilitiesOptions){
-        if(fac.getName() == fac_Name){return true;}
+    for (FacilityType fac : facilitiesOptions)
+    {
+        if (fac.getName() == fac_Name)
+        {
+            return true;
+        }
     }
     return to_ret;
-}       
+}

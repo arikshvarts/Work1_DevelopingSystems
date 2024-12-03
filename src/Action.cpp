@@ -1,11 +1,10 @@
 #include <string>
 #include <vector>
 #include "../include/Action.h"
-#include "../include/SelectionPolicy.h"
 #include <iostream>
 using namespace std;
 
-Simulation *backUp=nullptr;
+Simulation *backUp = nullptr;
 
 BaseAction::BaseAction() : status(ActionStatus::ERROR), _errorMsg(" ") {}
 
@@ -46,7 +45,7 @@ SimulateStep *SimulateStep ::clone() const
     // this method return a pointer to a new SimulateStep object with the same details
 }
 
-AddPlan ::AddPlan(const string &settlementName, const string &selectionPolicy) :BaseAction(), _settlementName(settlementName), _selectionPolicy(selectionPolicy) {}
+AddPlan ::AddPlan(const string &settlementName, const string &selectionPolicy) : BaseAction(), _settlementName(settlementName), _selectionPolicy(selectionPolicy) {}
 void AddPlan ::act(Simulation &simulation)
 {
     if (simulation.isSettlementExists(_settlementName) == true)
@@ -93,14 +92,16 @@ AddPlan *AddPlan ::clone() const
     // this method return a pointer to a new Addplan object with the same details
 }
 
-AddSettlement ::AddSettlement(const string &settlementName, SettlementType settlementType) : BaseAction(),_settlementName(settlementName), _settlementType(settlementType) {}
+AddSettlement ::AddSettlement(const string &settlementName, SettlementType settlementType) : BaseAction(), _settlementName(settlementName), _settlementType(settlementType) {}
 void AddSettlement ::act(Simulation &simulation)
 {
-    if(simulation.isSettlementExists(_settlementName) == false){
+    if (simulation.isSettlementExists(_settlementName) == false)
+    {
         simulation.addSettlement(new Settlement(_settlementName, _settlementType)); // asks for pointer
         complete();
     }
-    else{
+    else
+    {
         error("Settlement already exists");
         cout << "ERROR: " + getErrorMsg();
         return; // breaks the function, doesnt continue
@@ -118,18 +119,20 @@ const string AddSettlement ::toString() const
 }
 
 AddFacility ::AddFacility(const string &facilityName, const FacilityCategory facilityCategory, const int price, const int lifeQualityScore, const int economyScore, const int environmentScore)
-    :BaseAction(), _facilityName(facilityName), _facilityCategory(facilityCategory), _price(price), _lifeQualityScore(lifeQualityScore), _economyScore(economyScore), _environmentScore(environmentScore) {}
+    : BaseAction(), _facilityName(facilityName), _facilityCategory(facilityCategory), _price(price), _lifeQualityScore(lifeQualityScore), _economyScore(economyScore), _environmentScore(environmentScore) {}
 void AddFacility ::act(Simulation &simulation)
 {
-    if(simulation.IsFacilityExist(_facilityName) == false){
+    if (simulation.IsFacilityExist(_facilityName) == false)
+    {
         FacilityType facToAdd(_facilityName, _facilityCategory, _price, _lifeQualityScore, _economyScore, _environmentScore);
         simulation.addFacility(facToAdd); // asks for object
         complete();
     }
-    else{
+    else
+    {
         error("Facility already exists ");
         cout << "ERROR: " + getErrorMsg();
-        return; // breaks the function, doesnt continue        
+        return; // breaks the function, doesnt continue
     }
 }
 AddFacility *AddFacility ::clone() const
@@ -139,44 +142,49 @@ AddFacility *AddFacility ::clone() const
 }
 const string AddFacility ::toString() const {}
 
-    PrintPlanStatus :: PrintPlanStatus(int planId):BaseAction(), _planId(planId){}
-    void PrintPlanStatus :: act(Simulation &simulation){
-        if(simulation.IsPlanExist(_planId) == true){
-            Plan &p = simulation.getPlan(_planId); //create a new reference to the plan that getPlan returns,more efficient no need to copy the whole object
-            cout <<"Plan ID: " + to_string(_planId) + "     Settlement name:" + p.getSettlement().getName() << endl;
-            cout <<"Plan Status: ";
-            p.printStatus();
-            cout << endl;
-            cout << p.getSelectionPolicy().toString();
-            cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
-            vector<Facility*>& facilities = p.getFacilities();
-            for(Facility* fac: facilities) {
-                cout << fac->toString() << endl;
-            }
-        }
-        else{
-            error("Plan ID doesn't exist");
-            cout << "ERROR: " + getErrorMsg();
-            return; // breaks the function, doesnt continue
+PrintPlanStatus ::PrintPlanStatus(int planId) : _planId(planId) {}
+void PrintPlanStatus ::act(Simulation &simulation)
+{
+    if (simulation.IsPlanExist(_planId) == true)
+    {
+        Plan &p = simulation.getPlan(_planId); 
+        cout << "Plan ID: " + to_string(_planId) + "Settlement name:" + p.getSettlement().getName() << endl;
+        cout << "Plan Status: ";
+        // p.printStatus();
+        cout << endl;
+        cout << p.getSelectionPolicy();
+        cout << "LifeQualityScore: " + to_string(p.getlifeQualityScore()) + " EconomyScore: " + to_string(p.getEconomyScore()) + " EnviromentScore: " + to_string(p.getEnvironmentScore()) << endl;
+        vector<Facility *> &facilities = p.getFacilities();
+        for (Facility *fac : simulation.getPlan(0).getFacilities())
+        {
+            cout << fac->toString() << endl;
         }
     }
-    PrintPlanStatus* PrintPlanStatus :: clone() const{
-            return new PrintPlanStatus(*this);
+    else
+    {
+        error("Plan ID doesn't exist");
+        cout << "ERROR: " + getErrorMsg();
+        return; // breaks the function, doesnt continue
+    }
+}
+PrintPlanStatus *PrintPlanStatus ::clone() const
+{
+    return new PrintPlanStatus(*this);
     // this method return a pointer to a new PrintPlanStatus object with the same details
-    }
-    const string PrintPlanStatus :: toString() const{
-        cout << "Printed Plan Status" ;
-    }
-
+}
+const string PrintPlanStatus ::toString() const
+{
+    cout << "Printed Plan Status";
+}
 
 PrintActionsLog::PrintActionsLog()
 {
 }
 void PrintActionsLog::act(Simulation &simulation)
 {
-    for(BaseAction* s :simulation.getActionsLog())
+    for (BaseAction *s : simulation.getActionsLog())
     {
-        cout<<s->toString();
+        cout << s->toString();
     }
     complete();
 }
@@ -189,50 +197,58 @@ const string PrintActionsLog::toString() const
     return "actions log printed";
 }
 
-ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy):BaseAction(),planId(planId),newPolicy(newPolicy)
+ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy) : BaseAction(), planId(planId), newPolicy(newPolicy)
 {
-
 }
-void ChangePlanPolicy::act(Simulation &simulation) 
+void ChangePlanPolicy::act(Simulation &simulation)
 {
-    if(simulation.IsPlanExist(planId)&&simulation.getPlan(planId).getSelectionPolicy().toString()!=newPolicy)//improve this because not work for balanced
+    SelectionPolicy *policy=nullptr;
+    if (simulation.IsPlanExist(planId) )
     {
-        cout<<this->toString();
-        SelectionPolicy *policy; 
-        if (newPolicy == "nve")
+        if (newPolicy == simulation.getPlan(planId).getSelectionPolicy()) 
         {
             policy = new NaiveSelection();
         }
-        else if(newPolicy == "bal")
-         {policy = new BalancedSelection(simulation.getPlan(planId).getlifeQualityScore(),simulation.getPlan(planId).getEconomyScore(),simulation.getPlan(planId).getEnvironmentScore());}
-        else if (newPolicy == "eco")
+        else if (newPolicy ==simulation.getPlan(planId).getSelectionPolicy()) {
+            policy = new BalancedSelection(simulation.getPlan(planId).getlifeQualityScore(), simulation.getPlan(planId).getEconomyScore(), simulation.getPlan(planId).getEnvironmentScore());
+        }
+        else if (newPolicy == simulation.getPlan(planId).getSelectionPolicy())
         {
             policy = new EconomySelection();
         }
-        else if (newPolicy == "env")
+        else if (newPolicy == simulation.getPlan(planId).getSelectionPolicy())
         {
             policy = new SustainabilitySelection();
         }
+        else{
+                    error("Cannot change selection policy");
+        cout << "ERROR: " + getErrorMsg();
+        delete policy;
+        return; // breaks the function, doesnt continue
+        }
+        
         simulation.getPlan(planId).setSelectionPolicy(policy);
+        // delete policy;
+
     }
     else
     {
-            error("Cannot change selection policy");
-            cout << "ERROR: " + getErrorMsg();
-            return; // breaks the function, doesnt continue
+        error("Cannot change selection policy");
+        cout << "ERROR: " + getErrorMsg();
+        delete policy;
+        return; // breaks the function, doesnt continue
     }
 }
-ChangePlanPolicy* ChangePlanPolicy::clone() const 
+ChangePlanPolicy *ChangePlanPolicy::clone() const
 {
     return new ChangePlanPolicy(*this);
-
 }
-const string ChangePlanPolicy::toString() const 
+const string ChangePlanPolicy::toString() const
 {
-    return "pland ID:"+to_string(planId)+"previousPolicy:"+"new policy"+newPolicy;
+    return "pland ID:" + to_string(planId) + "previousPolicy:" + "new policy" + newPolicy;
 }
 
-Close::Close():BaseAction() {}
+Close::Close() : BaseAction() {}
 void Close::act(Simulation &simulation)
 {
     for (Plan &plan : simulation.getPlansVec())
@@ -243,7 +259,7 @@ void Close::act(Simulation &simulation)
         simulation.close();
     }
 }
-Close* Close::clone() const
+Close *Close::clone() const
 {
     return new Close(*this);
 }
@@ -252,7 +268,7 @@ const string Close::toString() const
     return "closed";
 }
 
-BackupSimulation::BackupSimulation():BaseAction() {}
+BackupSimulation::BackupSimulation() : BaseAction() {}
 void BackupSimulation::act(Simulation &simulation)
 {
     if (backUp)
@@ -271,12 +287,13 @@ const string BackupSimulation::toString() const
     return "simulation backed up Sucsesfully";
 }
 
-RestoreSimulation::RestoreSimulation():BaseAction()
+RestoreSimulation::RestoreSimulation() : BaseAction()
 {
 }
 void RestoreSimulation::act(Simulation &simulation)
 {
-    if (backUp == nullptr) {
+    if (backUp == nullptr)
+    {
         error("No backup available");
         cout << "ERROR: " + getErrorMsg();
         return;
@@ -287,9 +304,7 @@ void RestoreSimulation::act(Simulation &simulation)
     complete();
 }
 
-
-
-RestoreSimulation* RestoreSimulation::clone() const
+RestoreSimulation *RestoreSimulation::clone() const
 {
     return new RestoreSimulation(*this);
 }
