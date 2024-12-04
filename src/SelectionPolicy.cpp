@@ -12,7 +12,7 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
 {
 
     int counter=0;
-    int max_Facility_index=-999;
+    int Facility_index=-999;
     int currSmallest = std::numeric_limits<int>::max();
     for (FacilityType instance : facilitiesOptions)
     {
@@ -22,13 +22,17 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
         if(max({ec,env,lifeQual})-min({ec,env,lifeQual})<currSmallest)
         {
         currSmallest=max({ec,env,lifeQual})-min({ec,env,lifeQual});
-        max_Facility_index=counter;
+        Facility_index = counter;
         }
         counter++;
         
     }
-    return facilitiesOptions[max_Facility_index];
-    }
+    //updating the scores to be considered in the next balance selection include what will be under construction
+    LifeQualityScore = LifeQualityScore + facilitiesOptions[Facility_index].getLifeQualityScore();
+    EconomyScore = EconomyScore + facilitiesOptions[Facility_index].getEconomyScore();
+    EnvironmentScore = EnvironmentScore + facilitiesOptions[Facility_index].getEnvironmentScore();
+    return facilitiesOptions[Facility_index];
+}
 
 const string BalancedSelection::toString() const
 {

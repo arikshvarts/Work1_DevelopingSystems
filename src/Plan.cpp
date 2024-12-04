@@ -166,13 +166,12 @@ const string Plan::toString() const
     else
         statusString = "Available";
     totalString += "Settlement name:" + settlement.getName() + "\n";
-    totalString += "Plan Status: " + statusString;
+    totalString += "Plan Status: " + statusString +"\n";
 
     totalString += "Selection Policy: ";
     totalString += selectionPolicy->toStringSimple() + "\n";
     totalString += "LifeQualityScore: " + to_string(life_quality_score) + "\n" + " EconomyScore: " + to_string(economy_score) + "\n"
-                                                                                                                                " EnviromentScore: " +
-                   to_string(environment_score);
+    " EnviromentScore: " + to_string(environment_score) + "\n" ;
     for (Facility *curr : facilities)
     {
         totalString += "Facility Name: " + curr->getName() + "\n";
@@ -196,3 +195,7 @@ string Plan ::getSelectionPolicy() const
 {
     return selectionPolicy->toStringSimple();
 }
+    vector<Facility *> Plan :: getUnderConstruction() const{
+        return underConstruction;
+    }
+

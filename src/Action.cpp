@@ -56,7 +56,6 @@ void AddPlan ::act(Simulation &simulation)
             policy = new NaiveSelection();
         }
         else if(_selectionPolicy == "bal") {policy = new BalancedSelection(0,0,0);}
-        // livdok how to enter tho 3scores to the  new BalancedSelection
         else if (_selectionPolicy == "eco")
         {
             policy = new EconomySelection();
@@ -197,42 +196,62 @@ ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy) : 
 }
 void ChangePlanPolicy::act(Simulation &simulation)
 {
+    Plan &curr_plan = simulation.getPlan(planId);
+    string prevPolicy = curr_plan.getSelectionPolicy();
     SelectionPolicy *policy=nullptr;
+
     if (simulation.IsPlanExist(planId) )
     {
-        if (newPolicy == simulation.getPlan(planId).getSelectionPolicy()) 
+        if (newPolicy != simulation.getPlan(planId).getSelectionPolicy()) 
         {
-            policy = new NaiveSelection();
-        }
-        else if (newPolicy ==simulation.getPlan(planId).getSelectionPolicy()) {
-            policy = new BalancedSelection(simulation.getPlan(planId).getlifeQualityScore(), simulation.getPlan(planId).getEconomyScore(), simulation.getPlan(planId).getEnvironmentScore());
-        }
-        else if (newPolicy == simulation.getPlan(planId).getSelectionPolicy())
-        {
-            policy = new EconomySelection();
-        }
-        else if (newPolicy == simulation.getPlan(planId).getSelectionPolicy())
-        {
-            policy = new SustainabilitySelection();
+            if (newPolicy == "nve") 
+            {
+                policy = new NaiveSelection();
+            }
+            else if (newPolicy == "bal") {
+                int lifeQual_kolel = curr_plan.getlifeQualityScore();
+                int eco_kolel = curr_plan.getEconomyScore();
+                int env_kolel = curr_plan.getEnvironmentScore();
+                //we want to send the scores to the balance selectionPolicy considering also the facilities that under construction 
+                for (Facility* fac : curr_plan.getUnderConstruction()){
+                    lifeQual_kolel += fac->getLifeQualityScore();
+                    eco_kolel += fac->getEconomyScore();
+                    env_kolel += fac->getEnvironmentScore();                
+                }
+                policy = new BalancedSelection(lifeQual_kolel, eco_kolel, env_kolel);
+            }
+            else if (newPolicy == "eco")
+            {
+                policy = new EconomySelection();
+            }
+            else if (newPolicy == "env")
+            {
+                policy = new SustainabilitySelection();
+            }
+            else{
+                error("Cannot change selection policy");
+                cout << "ERROR: " + getErrorMsg();
+                delete policy;
+            }
         }
         else{
-                    error("Cannot change selection policy");
-        cout << "ERROR: " + getErrorMsg();
-        delete policy;
-        return; // breaks the function, doesnt continue
-        }
+            error("Tried to change to the same selection policy");
+            cout << "ERROR: " + getErrorMsg();
+            delete policy;
+            // delete policy;
+            }
+         simulation.getPlan(planId).setSelectionPolicy(policy);
         
-        simulation.getPlan(planId).setSelectionPolicy(policy);
-        // delete policy;
-
-    }
+        return; // breaks the function, doesnt continue
+    }        
     else
     {
-        error("Cannot change selection policy");
+        error("There is no such a plan id");
         cout << "ERROR: " + getErrorMsg();
         delete policy;
         return; // breaks the function, doesnt continue
     }
+    delete policy;
 }
 ChangePlanPolicy *ChangePlanPolicy::clone() const
 {
