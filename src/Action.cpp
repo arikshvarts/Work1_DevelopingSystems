@@ -291,8 +291,6 @@ void RestoreSimulation::act(Simulation &simulation)
         return;
     }
     simulation = *backup;
-    // delete backup;
-    // backup = nullptr;
     complete();
 }
 

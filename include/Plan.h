@@ -31,6 +31,7 @@ class Plan {
         vector<Facility*> deepCopyFacilities(const vector<Facility*>& facilities);
         const Settlement &getSettlement() const;
         string getSelectionPolicy() const;
+        SelectionPolicy* getSelectionPolicyPtr() const;
 
 
 
