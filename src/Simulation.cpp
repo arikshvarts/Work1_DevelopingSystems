@@ -73,6 +73,13 @@ Simulation::Simulation(const Simulation &sim) : isRunning(sim.isRunning), planCo
     {
         settlements.push_back(ptr->clone());
     }
+    int idx = 0;
+
+    for (Plan pl : sim.plans) {
+    Settlement& sett = getSettlement(pl.getSettlement().getName());
+    plans.emplace_back(idx, sett, pl.getSelectionPolicyPtr(), facilitiesOptions);
+    idx++;}
+
 }
 Simulation &Simulation::operator=(const Simulation &sim)
 {

@@ -32,6 +32,8 @@ class Plan {
         const Settlement &getSettlement() const;
         string getSelectionPolicy() const;
         vector<Facility*> getUnderConstruction() const;
+        SelectionPolicy* getSelectionPolicyPtr() const;
+
 
 
 
