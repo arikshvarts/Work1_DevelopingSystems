@@ -63,7 +63,7 @@ Simulation::Simulation(const string &configFilePath) : planCounter(0),
     }
     inputFile.close(); // Close the file after processing
 }
-Simulation::Simulation(const Simulation &sim) : settlements(), actionsLog(), isRunning(sim.isRunning), planCounter(sim.planCounter), plans(plans), facilitiesOptions(facilitiesOptions)
+Simulation::Simulation(const Simulation &sim) : settlements(), actionsLog(), isRunning(sim.isRunning), planCounter(sim.planCounter), facilitiesOptions(sim.facilitiesOptions)
 {
     for (BaseAction* ptr : sim.actionsLog)
     {
@@ -73,6 +73,13 @@ Simulation::Simulation(const Simulation &sim) : settlements(), actionsLog(), isR
     {
         settlements.push_back(ptr->clone());
     }
+    int idx = 0;
+
+    for (Plan pl : sim.plans) {
+    Settlement& sett = getSettlement(pl.getSettlement().getName());
+    plans.emplace_back(idx, sett, pl.getSelectionPolicyPtr(), facilitiesOptions);
+    idx++;}
+
 }
 Simulation &Simulation::operator=(const Simulation &sim)
 {

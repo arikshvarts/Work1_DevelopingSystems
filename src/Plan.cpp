@@ -14,7 +14,6 @@ Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *sele
 Plan::Plan(const Plan &other)
     : plan_id(other.plan_id),
       settlement(other.settlement),
-      selectionPolicy(),
       status(other.status),
       facilities(),
       underConstruction(),
@@ -195,4 +194,9 @@ const Settlement &Plan ::getSettlement() const
 string Plan ::getSelectionPolicy() const
 {
     return selectionPolicy->toStringSimple();
+}
+
+SelectionPolicy* Plan ::getSelectionPolicyPtr() const
+{
+    return selectionPolicy->clone();
 }
