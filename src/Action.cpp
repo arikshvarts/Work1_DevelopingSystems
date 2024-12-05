@@ -37,7 +37,7 @@ void SimulateStep ::act(Simulation &simulation)
 }
 const string SimulateStep ::toString() const
 {
-    return "Simulated" + std::to_string(_numOfSteps) + " steps";
+    return std::to_string(_numOfSteps) + " steps \n";
 }
 SimulateStep *SimulateStep ::clone() const
 {
@@ -83,7 +83,7 @@ void AddPlan ::act(Simulation &simulation)
 const string AddPlan ::toString() const
 {
 
-    return "Added a new Plan to " + _settlementName + "settlemnt, with " + _selectionPolicy + " Policy";
+    return "Settlement" + _settlementName + " " + _selectionPolicy + " \n";
 }
 AddPlan *AddPlan ::clone() const
 {
@@ -114,7 +114,7 @@ AddSettlement *AddSettlement ::clone() const
 const string AddSettlement ::toString() const
 {
     string types[3] = {"Village", "City", "Metropolin"};
-    return "Added a new Settlement: " + _settlementName + " from type: " + types[int(_settlementType)];
+    return "Settlement " + _settlementName + " " + types[int(_settlementType)] + " \n";
 }
 
 AddFacility ::AddFacility(const string &facilityName, const FacilityCategory facilityCategory, const int price, const int lifeQualityScore, const int economyScore, const int environmentScore)
@@ -141,7 +141,7 @@ AddFacility *AddFacility ::clone() const
 }
 const string AddFacility ::toString() const {
         string statusAct;
-    return  "Facility added - " + _facilityName;
+    return  "Facility " + _facilityName + " " + to_string(_lifeQualityScore) + " " + to_string(_economyScore) + " " +to_string(_environmentScore) + " \n";
 }
 
 PrintPlanStatus ::PrintPlanStatus(int planId) :BaseAction(), _planId(planId) {}
@@ -168,7 +168,7 @@ PrintPlanStatus *PrintPlanStatus ::clone() const
 const string PrintPlanStatus ::toString() const
 {
     string statusAct;
-    return  "Printed Plan Status"+to_string(_planId);
+    return  "PlanStatus " + to_string(_planId) + " \n";
 }
 
 PrintActionsLog::PrintActionsLog()
@@ -176,9 +176,9 @@ PrintActionsLog::PrintActionsLog()
 }
 void PrintActionsLog::act(Simulation &simulation)
 {
-    for (BaseAction *s : simulation.getActionsLog())
+    for (BaseAction *act : simulation.getActionsLog())
     {
-        cout << s->toString();
+        cout << act->toString();
     }
     complete();
 }
@@ -188,7 +188,7 @@ PrintActionsLog *PrintActionsLog::clone() const
 }
 const string PrintActionsLog::toString() const
 {
-    return "actions log printed";
+    return "Actions log printed \n";
 }
 
 ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy) : BaseAction(), planId(planId), newPolicy(newPolicy)
@@ -259,7 +259,7 @@ ChangePlanPolicy *ChangePlanPolicy::clone() const
 }
 const string ChangePlanPolicy::toString() const
 {
-    return "pland ID:" + to_string(planId) + "previousPolicy:" + "new policy" + newPolicy;
+    return "pland " + to_string(planId) + " " + newPolicy + " \n";
 }
 
 Close::Close() : BaseAction() {}
@@ -270,7 +270,7 @@ void Close::act(Simulation &simulation)
         {
             cout << plan.toString();
         }
-        simulation.close();
+        // simulation.close();
     }
 }
 Close *Close::clone() const
@@ -279,7 +279,7 @@ Close *Close::clone() const
 }
 const string Close::toString() const
 {
-    return "closed";
+    return "Closed \n";
 }
 
 BackupSimulation::BackupSimulation() : BaseAction() {}
@@ -298,7 +298,7 @@ BackupSimulation *BackupSimulation::clone() const
 }
 const string BackupSimulation::toString() const
 {
-    return "backup COMPLETED";
+    return "Backup \n";
 }
 
 RestoreSimulation::RestoreSimulation() : BaseAction()
@@ -322,5 +322,5 @@ RestoreSimulation *RestoreSimulation::clone() const
 }
 const string RestoreSimulation::toString() const
 {
-    return "simulation restored";
+    return "Restored \n";
 }

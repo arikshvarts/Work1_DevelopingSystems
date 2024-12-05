@@ -23,7 +23,7 @@ clean:
 
 # Run the compiled program
 run:
-	./bin/simulation
+	./bin/simulation config_file.txt
 
 # Run the program with Valgrind
 valgrind: all

@@ -14,6 +14,7 @@ Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *sele
 Plan::Plan(const Plan &other)
     : plan_id(other.plan_id),
       settlement(other.settlement),
+      selectionPolicy(nullptr), // Initialize to nullptr and we will check later      
       status(other.status),
       facilities(),
       underConstruction(),
@@ -21,6 +22,7 @@ Plan::Plan(const Plan &other)
       life_quality_score(other.life_quality_score),
       economy_score(other.economy_score),
       environment_score(other.environment_score)
+
 {
     if (other.selectionPolicy != nullptr)
         selectionPolicy = other.selectionPolicy->clone();
