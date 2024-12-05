@@ -63,7 +63,7 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
     }
     inputFile.close(); // Close the file after processing
 }
-Simulation::Simulation(const Simulation &sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), actionsLog(), plans(sim.plans), settlements(), facilitiesOptions(sim.facilitiesOptions)
+Simulation::Simulation(const Simulation &sim) : isRunning(sim.isRunning), planCounter(sim.planCounter), actionsLog(), plans(), settlements(), facilitiesOptions(sim.facilitiesOptions)
 {
     for (BaseAction* ptr : sim.actionsLog)
     {
@@ -73,12 +73,17 @@ Simulation::Simulation(const Simulation &sim) : isRunning(sim.isRunning), planCo
     {
         settlements.push_back(ptr->clone());
     }
-    int idx = 0;
-
-    for (Plan pl : sim.plans) {
-    Settlement& sett = getSettlement(pl.getSettlement().getName());
-    plans.emplace_back(idx, sett, pl.getSelectionPolicyPtr(), facilitiesOptions);
-    idx++;}
+    for (Plan pl : sim.plans)
+    {
+        Settlement &sett = getSettlement(pl.getSettlement().getName());
+        Plan planToInsert(pl.getPlanId(), sett, pl.getSelectionPolicyPtr()->clone(), pl.getPlanStatus(),
+                          facilitiesOptions, pl.getlifeQualityScore(), pl.getEconomyScore(), pl.getEnvironmentScore());
+        for (Facility *fac : pl.getFacilities())
+            planToInsert.addFacility(fac->clone());
+        for (Facility *facCon : pl.getUnderConstruction())
+            planToInsert.addFacility(facCon->clone());
+        plans.push_back(planToInsert);
+    }
 
 }
 Simulation &Simulation::operator=(const Simulation &sim)
@@ -97,7 +102,7 @@ Simulation &Simulation::operator=(const Simulation &sim)
             delete ptr;
         }
         settlements.clear();
-
+        plans.clear();
         // Deep copy the actionsLog
         for (BaseAction *ptr : sim.actionsLog)
         {
@@ -113,12 +118,16 @@ Simulation &Simulation::operator=(const Simulation &sim)
         // Copy primitive members
         isRunning = sim.isRunning;
         planCounter = sim.planCounter;
-        plans.clear();
-
-        // Copy each Plan from the other Simulation
-        for (Plan plan : sim.plans)
+        for (Plan pl : sim.plans)
         {
-            plans.push_back(plan);
+            Settlement &sett = getSettlement(pl.getSettlement().getName());
+            Plan planToInsert(pl.getPlanId(), sett, pl.getSelectionPolicyPtr()->clone(), pl.getPlanStatus(),
+                            facilitiesOptions, pl.getlifeQualityScore(), pl.getEconomyScore(), pl.getEnvironmentScore());
+            for (Facility *fac : pl.getFacilities())
+                planToInsert.addFacility(fac->clone());
+            for (Facility *facCon : pl.getUnderConstruction())
+                planToInsert.addFacility(facCon->clone());
+            plans.push_back(planToInsert);
         }
         facilitiesOptions.clear();
         for (FacilityType facility : sim.facilitiesOptions)

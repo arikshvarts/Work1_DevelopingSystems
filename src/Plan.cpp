@@ -11,6 +11,24 @@ Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *sele
 {
 }
 
+Plan::Plan(const int planId,
+           const Settlement &settlement,
+           SelectionPolicy *selectionPolicy,
+           PlanStatus stat,
+           const vector<FacilityType> &facilityOptions,
+           int life_quality_score,
+           int economy_score,
+           int environment_score)
+    : Plan(planId, settlement, selectionPolicy, facilityOptions)
+{
+    // Initialize scores
+    this->economy_score = economy_score;
+    this->environment_score = environment_score;
+    this->life_quality_score = life_quality_score;
+    this->status =stat;
+}
+
+
 Plan::Plan(const Plan &other)
     : plan_id(other.plan_id),
       settlement(other.settlement),
@@ -25,7 +43,7 @@ Plan::Plan(const Plan &other)
 
 {
     if (other.selectionPolicy != nullptr)
-        selectionPolicy = other.selectionPolicy->clone();
+        selectionPolicy = other.selectionPolicy ? other.selectionPolicy->clone() : nullptr;
     else
         selectionPolicy = nullptr;
 
@@ -203,5 +221,10 @@ string Plan ::getSelectionPolicy() const
 
 SelectionPolicy* Plan ::getSelectionPolicyPtr() const
 {
-    return selectionPolicy->clone();
+    return selectionPolicy;
+}
+
+PlanStatus Plan ::getPlanStatus() const
+{
+    return status;
 }
