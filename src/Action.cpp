@@ -265,13 +265,14 @@ const string ChangePlanPolicy::toString() const
 Close::Close() : BaseAction() {}
 void Close::act(Simulation &simulation)
 {
-    for (Plan &plan : simulation.getPlansVec())
-    {
-        {
-            cout << plan.toString();
-        }
-        // simulation.close();
-    }
+    // for (Plan &plan : simulation.getPlansVec())
+    // {
+    //     {
+    //         cout << plan.toString();
+    //     }
+    //     simulation.close();
+    // }
+    simulation.close();
 }
 Close *Close::clone() const
 {

@@ -325,6 +325,13 @@ void Simulation::step()
 void Simulation::close()
 {
     isRunning = false;
+    for (Plan& curr: plans) {
+        string str = "Plan Id: " + std::to_string(curr.getPlanId()) + " \n";
+        cout << "Settlement Name: " + curr.getSettlement().getName() + " \n";
+        cout << "Life quality score: " + std::to_string(curr.getlifeQualityScore()) + " \n";
+        cout << "Economy score: " + std::to_string(curr.getEconomyScore()) + " \n";
+        cout << "Environment score: " + std::to_string(curr.getEnvironmentScore()) + " \n";
+    }
 }
 void Simulation::open()
 {
