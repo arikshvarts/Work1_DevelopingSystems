@@ -129,10 +129,9 @@ void Plan::step()
             economy_score += underConstruction[it]->getEconomyScore();
             environment_score += underConstruction[it]->getEnvironmentScore();
             life_quality_score += underConstruction[it]->getLifeQualityScore();
+            // Move the instance to the facilities vector
             Plan::addFacility(underConstruction[it]);
             underConstruction[it]->setStatus(FacilityStatus::OPERATIONAL);
-            // Move the instance to the facilities vector
-            facilities.push_back(underConstruction[it]);
             // Remove the instance from underConstruction
             underConstruction.erase(underConstruction.begin() + it);
         }
