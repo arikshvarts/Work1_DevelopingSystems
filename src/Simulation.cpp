@@ -351,48 +351,6 @@ vector<Plan> &Simulation::getPlansVec()
 {
     return plans;
 }
-
-void Simulation::printInitialState() const
-{
-    cout << "Simulation Initial State:" << endl;
-    cout << "isRunning: " << (isRunning ? "true" : "false") << endl;
-    cout << "planCounter: " << planCounter << endl;
-
-    cout << "Settlements:" << endl;
-    if (settlements.empty())
-    {
-        cout << "  None" << endl;
-    }
-    else
-    {
-        for (const auto &settlement : settlements)
-        {
-            cout << settlement->toString() << endl;
-        }
-    }
-
-    cout << "Facilities Options:" << endl;
-    if (facilitiesOptions.empty())
-    {
-        cout << "  None" << endl;
-    }
-    else
-    {
-        for (const auto &facility : facilitiesOptions)
-        {
-            cout << "  Name: " << facility.getName()
-                 << " , Category: " << int(facility.getCategory()) << "\n"
-                 << ", Price: " << facility.getCost()
-                 << ", Life Quality Score: " << facility.getLifeQualityScore()
-                 << ", Economy Score: " << facility.getEconomyScore()
-                 << ", Environment Score: " << facility.getEnvironmentScore() << endl;
-        }
-    }
-}
-// Simulation *Simulation::clone() const
-// {
-//     return new Simulation(*this); // Use copy constructor to create a deep copy
-// }
 vector<BaseAction *> Simulation::getActionsLog() const
 {
     return actionsLog;
